@@ -1,0 +1,39 @@
+{
+  "brand": "М-ТРЕНИНГ",
+  "tagline": "Футбольная школа силового тренинга",
+  "brief": "Футбольная школа силового тренинга для детей и подростков. Задача — создать смелый, современный, минималистичный знак, который объединяет футбол, силовую подготовку и букву «М», сохраняя преемственность с восходящим мячом исходного логотипа и безупречно работая на форме, инвентаре и в соцсетях (16–32 px).",
+  "adjectives": ["смелый", "атлетичный", "современный", "динамичный", "надёжный"],
+  "criteria": "Узнаваемость в 16 px, работа в 1 цвет и в инверсии на форме, сильный спортивный характер без мелких нечитаемых деталей.",
+  "industry": "education",
+  "mockups": ["tshirt", "badge", "signage", "app-icon", "social", "website"],
+  "nav": ["Программы", "Тренеры", "Записаться"],
+  "brand_color": "#D9381E",
+  "tile_color": "#0F172A",
+  "greyscale": false,
+  "final": true,
+  "designer": "Logo Design Studio",
+  "round": 2,
+  "concepts": [
+    {
+      "name": "Щит-Академия М",
+      "symbol": "kit/final-symbol.svg",
+      "lockup": "kit/final-horizontal.svg",
+      "stacked": "kit/final-stacked.svg",
+      "avatar": "kit/final-symbol-small.svg",
+      "symbol_on_tile": "kit/final-symbol-on-dark.svg",
+      "stacked_on_tile": "kit/final-stacked-on-dark.svg",
+      "lockup_on_tile": "kit/final-horizontal-on-dark.svg",
+      "symbol_on_dark": "kit/final-symbol-on-dark.svg",
+      "lockup_on_dark": "kit/final-horizontal-on-dark.svg",
+      "stacked_on_dark": "kit/final-stacked-on-dark.svg",
+      "idea": "Восходящий купол футбольного мяча переходит в силовые опоры буквы «М», формируя современный щит футбольной академии.",
+      "rationale": [
+        "Сохраняет главный визуальный якорь исходного логотипа — восходящую сферу футбольного мяча.",
+        "Центральная пятиугольная грань мяча (Athletic Pulse #D9381E) входит под углом 45° точно в вырез массивной буквы «М».",
+        "Форма клубного шеврона идеально подходит для вышивки и термопечати на тренировочной форме.",
+        "Специальная версия малого кегля (16–24 px) с расширенными каналами сохраняет чёткость на фавиконках и аватарках."
+      ]
+    }
+  ],
+  "recommendation": "Финальный комплект подготовлен в фирменной палитре Stadium Carbon (#0F172A) + Athletic Pulse (#D9381E / #FF5733) со всеми вариантами компоновки и веб-иконками."
+}
