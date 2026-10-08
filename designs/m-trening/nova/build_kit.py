@@ -24,15 +24,15 @@ EXP = os.path.join(KIT, "exports")
 os.makedirs(EXP, exist_ok=True)
 
 STYLE = "varsity"
-SYM = nl.symbol_gem_shield()
-SYM_MONO = nl.symbol_gem_shield_mono()
-EMB = nl.symbol_mane_roundel()
-EMB_MONO = nl.symbol_mane_roundel_mono()
+SYM = nl.symbol_lion_mascot()
+SYM_MONO = nl.symbol_lion_mono()
+EMB = nl.symbol_comic_crest()
+EMB_MONO = nl.symbol_gem_shield_mono()
 SMALL = nl.symbol_gem_small()
 
 PAL_LIGHT = dict(nl.PAL_FULL)
 PAL_BLUE = dict(nl.PAL_FULL, wm=nl.WHITE)
-PAL_DEEP = dict(nl.PAL_FULL, wm=nl.WHITE)
+PAL_DEEP = dict(nl.PAL_FULL, wm=nl.WHITE, wmo=nl.BLUE)
 PAL_MW = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
 PAL_MB = {"main": nl.BLUE, "accent": nl.BLUE, "wm": nl.BLUE}
 PAL_MD = {"main": nl.DEEP, "accent": nl.DEEP, "wm": nl.DEEP}
@@ -76,11 +76,11 @@ def main():
     write_svg("logo-emblem-mono-white.svg", nl.svg_symbol(EMB_MONO, PAL_MW, "М-ТРЕНИНГ — эмблема монохром"))
     write_svg("logo-symbol-small.svg", nl.svg_symbol(SMALL, PAL_MB, "М-ТРЕНИНГ — знак 16-48 px"))
     write_svg("logo-symbol-small-mono-white.svg", nl.svg_symbol(SMALL, PAL_MW, "М-ТРЕНИНГ — знак 16-48 px"))
-    write_svg("logo-horizontal.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE), PAL_LIGHT, "М-ТРЕНИНГ"))
-    write_svg("logo-horizontal-on-blue.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE), PAL_BLUE, "М-ТРЕНИНГ"))
-    write_svg("logo-horizontal-on-dark.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE), PAL_DEEP, "М-ТРЕНИНГ"))
-    write_svg("logo-stacked.svg", nl.svg_from_layout(nl.lockup_v(SYM, STYLE), PAL_LIGHT, "М-ТРЕНИНГ"))
-    write_svg("logo-stacked-on-dark.svg", nl.svg_from_layout(nl.lockup_v(SYM, STYLE), PAL_DEEP, "М-ТРЕНИНГ"))
+    write_svg("logo-horizontal.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE, comic=True), PAL_LIGHT, "М-ТРЕНИНГ"))
+    write_svg("logo-horizontal-on-blue.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE, comic=True), PAL_BLUE, "М-ТРЕНИНГ"))
+    write_svg("logo-horizontal-on-dark.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE, comic=True), PAL_DEEP, "М-ТРЕНИНГ"))
+    write_svg("logo-stacked.svg", nl.svg_from_layout(nl.lockup_v(SYM, STYLE, comic=True), PAL_LIGHT, "М-ТРЕНИНГ"))
+    write_svg("logo-stacked-on-dark.svg", nl.svg_from_layout(nl.lockup_v(SYM, STYLE, comic=True), PAL_DEEP, "М-ТРЕНИНГ"))
     d, w, wb = nl.wordmark("М-ТРЕНИНГ", STYLE)
     lay = {"vb": (wb[0] - 4, wb[1] - 4, (wb[2] - wb[0]) + 8, (wb[3] - wb[1]) + 8),
            "groups": [("translate(0 0)", [(d, "wm")])]}
@@ -94,7 +94,7 @@ def main():
     png(nl.svg_symbol(SYM_MONO, PAL_MB), 1024, 1024, "symbol-mono-blue-transparent-1024.png")
     png(nl.svg_symbol(EMB, PAL_LIGHT), 512, 512, "emblem-on-white-512.png", bg=nl.WHITE)
     png(nl.svg_symbol(EMB, PAL_DEEP), 512, 512, "emblem-on-deep-512.png", bg=nl.DEEP)
-    lh = nl.lockup_h(SYM, STYLE)
+    lh = nl.lockup_h(SYM, STYLE, comic=True)
     vb = lh["vb"]
     png(nl.svg_from_layout(lh, PAL_LIGHT), int(vb[2] * 1.5625), 400,
         "horizontal-on-white-1600.png", bg=nl.WHITE)
@@ -102,7 +102,7 @@ def main():
         "horizontal-on-blue-1600.png", bg=nl.BLUE)
     png(nl.svg_from_layout(lh, PAL_DEEP), int(vb[2] * 1.5625), 400,
         "horizontal-on-deep-1600.png", bg=nl.DEEP)
-    lv = nl.lockup_v(SYM, STYLE)
+    lv = nl.lockup_v(SYM, STYLE, comic=True)
     vbv = lv["vb"]
     png(nl.svg_from_layout(lv, PAL_LIGHT), 1024, int(1024 * vbv[3] / vbv[2]),
         "stacked-on-white-1024w.png", bg=nl.WHITE)

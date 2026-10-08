@@ -478,9 +478,12 @@ def wordmark(text, style):
 
 
 # ================================================================ КОМПОНОВКИ
-def lockup_h(sym, style, text="М-ТРЕНИНГ"):
+def lockup_h(sym, style, text="М-ТРЕНИНГ", comic=False):
     """Горизонтальная компоновка: знак слева, леттеринг справа."""
-    d, w_wm, wb = wordmark(text, style)
+    if comic:
+        layers, w_wm, wb = wordmark_comic(text, style)
+    else:
+        layers, w_wm, wb = [(wordmark(text, style)[0], "wm")], *wordmark(text, style)[1:]
     ink_w = wb[2] - wb[0]
     bx0, by0, bx1, by1 = sym["bbox"]
     sym_w = bx1 - bx0
@@ -497,15 +500,18 @@ def lockup_h(sym, style, text="М-ТРЕНИНГ"):
         "vb": (0, 0, math.ceil(total), int(H)),
         "groups": [
             (f"translate({ntos(-bx0)} {ntos(ty)})", sym["shapes"]),
-            (f"translate({ntos(wx)} {ntos(wy)}) scale({ntos(ws)})",
-             [(d, "wm")]),
+            (f"translate({ntos(wx)} {ntos(wy)}) scale({ntos(ws)})", layers),
         ],
     }
 
 
-def lockup_v(sym, style, text="М-ТРЕНИНГ"):
+def lockup_v(sym, style, text="М-ТРЕНИНГ", comic=False):
     """Вертикальная компоновка: знак сверху, леттеринг снизу по центру."""
-    d, w_wm, _b = wordmark(text, style)
+    if comic:
+        layers, w_wm, _b = wordmark_comic(text, style)
+    else:
+        dw = wordmark(text, style)
+        layers, w_wm, _b = [(dw[0], "wm")], dw[1], dw[2]
     bx0, by0, bx1, by1 = sym["bbox"]
     sym_w = bx1 - bx0
     sym_h = by1 - by0
@@ -523,8 +529,7 @@ def lockup_v(sym, style, text="М-ТРЕНИНГ"):
         "vb": (0, 0, math.ceil(W), H),
         "groups": [
             (f"translate({ntos(tx)} {ntos(ty)})", sym["shapes"]),
-            (f"translate({ntos(wx)} {ntos(wy)}) scale({ntos(ws)})",
-             [(d, "wm")]),
+            (f"translate({ntos(wx)} {ntos(wy)}) scale({ntos(ws)})", layers),
         ],
     }
 
@@ -1241,3 +1246,189 @@ def symbol_mane_roundel_mono():
     return {"shapes": [(to_d(ring), "main"), (to_d(dif(field, holes)), "main")],
             "bbox": (24, 24, 232, 232), "baseline": 232,
             "name": "ГРИВА", "letter": "Q", "idea": ""}
+
+
+def _soft(pts, w=12):
+    """Скруглённый мультяшный многоугольник: заливка + обводка с round-стыками."""
+    p = stroke_polyline(pts + [pts[0]], w, "round", "round", 4)
+    return uni(p, poly(pts))
+
+
+def outline_of(*parts, **kw):
+    """Комикс-контур: силуэт из parts, расширенный круглой обводкой."""
+    w = kw.get("w", 9)
+    a = uni(*parts)
+    b = uni(*parts, parts[0])          # всегда новый объект для in-place stroke
+    b.stroke(w, pathops.LineCap.ROUND_CAP, pathops.LineJoin.ROUND_JOIN, 6.0)
+    b.convertConicsToQuads()
+    return uni(a, b)
+
+
+def symbol_lion_mascot():
+    """R «ЛЕВ»: комикс-талисман — серьёзный лев с гранёным мячом в зубах.
+    Плотный navy-контур, сел-шейдинг, скруглённые формы, золотая грива."""
+    parts = []
+    spikes = []
+    for i in range(14):                      # грива-пламя
+        a = math.radians(i * (360 / 14) + 90)
+        tip = (128 + 102 * math.cos(a), 132 + 102 * math.sin(a))
+        b0 = (128 + 62 * math.cos(a - 0.21), 132 + 62 * math.sin(a - 0.21))
+        b1 = (128 + 62 * math.cos(a + 0.21), 132 + 62 * math.sin(a + 0.21))
+        spikes.append(_soft([b0, tip, b1], 10))
+    mane = uni(*spikes)
+    face_pts = [(128, 62), (178, 84), (190, 134), (168, 182), (128, 200),
+                (88, 182), (66, 134), (78, 84)]
+    face = _soft(face_pts, 14)
+    silhouette = uni(mane, face)
+    parts.append((to_d(outline_of(mane, face, w=10)), "outline"))
+    parts.append((to_d(mane), "gold"))
+    parts.append((to_d(face), "main"))
+    shade = itr(face, poly([(160, 68), (190, 134), (168, 182), (128, 200),
+                            (148, 140)]))                              # сел-тень справа
+    parts.append((to_d(shade), "dark"))
+    hl = _soft([(94, 74), (122, 66), (114, 86), (92, 90)], 6)          # блик
+    parts.append((to_d(hl), "lite"))
+    brow_l = poly([(90, 100), (118, 112), (118, 122), (90, 110)])       # серьёзные брови
+    brow_r = poly([(166, 100), (138, 112), (138, 122), (166, 110)])
+    parts.append((to_d(uni(brow_l, brow_r)), "gold"))
+    eye_l = _soft([(96, 118), (118, 124), (116, 140), (98, 136)], 6)
+    eye_r = _soft([(160, 118), (138, 124), (140, 140), (158, 136)], 6)
+    parts.append((to_d(uni(eye_l, eye_r)), "white"))
+    parts.append((to_d(uni(circle(110, 131, 5), circle(146, 131, 5))), "outline"))
+    parts.append((to_d(circle(128, 172, 38)), "outline"))               # контур мяча
+    parts += gem_ball(128, 172, 34)                                     # мяч в зубах
+    fang_l = poly([(106, 146), (113, 162), (120, 146)])
+    fang_r = poly([(150, 146), (143, 162), (136, 146)])
+    parts.append((to_d(uni(fang_l, fang_r)), "white"))
+    return {
+        "shapes": parts,
+        "bbox": (22, 26, 234, 238),
+        "baseline": 238,
+        "name": "ЛЕВ",
+        "letter": "R",
+        "idea": "Комикс-талисман: серьёзный лев с гранёным мячом в зубах — "
+                "плотный контур, сел-шейдинг и золотая грива-пламя; сила школы "
+                "с характером мульт-героя.",
+    }
+
+
+def symbol_knight():
+    """S «РЫЦАРЬ»: комикс-шлем турнирного рыцаря с золотым плюмажем."""
+    dome = _soft([(128, 44), (176, 62), (188, 116), (176, 176), (128, 196),
+                  (80, 176), (68, 116), (80, 62)], 14)
+    plume = _soft([(128, 20), (150, 34), (146, 58), (128, 50), (110, 58),
+                   (106, 34)], 10)
+    parts = [(to_d(outline_of(dome, plume, w=10)), "outline"),
+             (to_d(plume), "gold"),
+             (to_d(dome), "main"),
+             (to_d(itr(dome, poly([(158, 60), (188, 116), (176, 176), (128, 196),
+                                   (150, 130)]))), "shade")]
+    visor = _soft([(84, 108), (172, 108), (168, 126), (88, 126)], 8)
+    parts.append((to_d(visor), "outline"))
+    eye_l = circle(108, 117, 6)
+    eye_r = circle(148, 117, 6)
+    parts.append((to_d(uni(eye_l, eye_r)), "gold"))
+    crest = _soft([(104, 150), (152, 150), (146, 172), (110, 172)], 8)
+    parts.append((to_d(crest), "gold"))
+    parts += [(d, r) for d, r in gem_ball(128, 160, 0)] if False else []
+    return {
+        "shapes": parts,
+        "bbox": (58, 12, 198, 204),
+        "baseline": 204,
+        "name": "РЫЦАРЬ",
+        "letter": "S",
+        "idea": "Шлем турнирного рыцаря: плюмаж, забрало и золотой взгляд — "
+                "серьёзный комикс-боец.",
+    }
+
+
+def symbol_comic_crest():
+    """T «КОМИКС-ГЕРБ»: «КРИСТАЛЛ» в комикс-обработке — контур, сел-тень, блик."""
+    base = symbol_gem_shield()
+    sil = None
+    for d, r in base["shapes"]:
+        p = pathops.Path()
+        p.addPathFromSvg(d) if hasattr(p, "addPathFromSvg") else None
+    sh = shield_base()
+    parts = [(to_d(outline_of(sh, w=12)), "outline")]
+    parts += base["shapes"]
+    field = _scaled(sh, 0.86)
+    rim = dif(field, _scaled(sh, 0.74))
+    parts.append((to_d(itr(rim, rect(128, 0, 128, 256))), "shade"))
+    parts.append((to_d(itr(field, poly([(52, 48), (92, 48), (64, 110), (52, 110)]))), "lite"))
+    return {
+        "shapes": parts,
+        "bbox": (28, 28, 228, 250),
+        "baseline": 250,
+        "name": "КОМИКС-ГЕРБ",
+        "letter": "T",
+        "idea": "Тот же клубный щит с кристаллом, но в комикс-обработке: "
+                "жирный контур, сел-тень справа и блик слева — объём как в мульт-афише.",
+    }
+
+
+def wordmark_comic(text, style, ow=12, off=7):
+    """Леттеринг с комикс-слоями: тень, контур, заливка."""
+    st = STYLES[style]
+    x = 0.0
+    out = None
+    for ch in text:
+        g, adv = _glyph(GLYPH_KEYS[ch], st)
+        if g is None:
+            x += adv + st["tr"]
+            continue
+        shifted = g.transform(1, 0, 0, 1, x, 0)
+        out = shifted if out is None else pathops.op(out, shifted, pathops.PathOp.UNION)
+        x += adv + st["tr"]
+    x -= st["tr"]
+    shadow = out.transform(1, 0, 0, 1, off, off)
+    ring = uni(out, out)
+    ring.stroke(ow, pathops.LineCap.ROUND_CAP, pathops.LineJoin.ROUND_JOIN, 6.0)
+    ring.convertConicsToQuads()
+    b = bounds(shadow)
+    return [(to_d(shadow), "wmsh"), (to_d(ring), "wmo"), (to_d(out), "wm")], x, b
+
+
+PAL_FULL["outline"] = DEEP
+PAL_FULL["shade"] = "#142450"
+PAL_FULL["wmsh"] = GOLD
+PAL_FULL["wmo"] = DEEP
+
+
+def symbol_lion_mono():
+    """Моно-«ЛЕВ»: силуэт с гривой, вырубленные глаза и фасеты мяча."""
+    spikes = []
+    for i in range(14):
+        a = math.radians(i * (360 / 14) + 90)
+        tip = (128 + 102 * math.cos(a), 132 + 102 * math.sin(a))
+        b0 = (128 + 62 * math.cos(a - 0.21), 132 + 62 * math.sin(a - 0.21))
+        b1 = (128 + 62 * math.cos(a + 0.21), 132 + 62 * math.sin(a + 0.21))
+        spikes.append(_soft([b0, tip, b1], 10))
+    mane = uni(*spikes)
+    face = _soft([(128, 62), (178, 84), (190, 134), (168, 182), (128, 200),
+                  (88, 182), (66, 134), (78, 84)], 14)
+    sil = outline_of(mane, face, w=10)
+    eye_l = _soft([(96, 118), (118, 124), (116, 140), (98, 136)], 6)
+    eye_r = _soft([(160, 118), (138, 124), (140, 140), (158, 136)], 6)
+    holes = uni(eye_l, eye_r, _gem_cut(128, 172, 34))
+    body = dif(sil, holes)
+    pupils = uni(circle(110, 131, 5), circle(146, 131, 5))
+    return {"shapes": [(to_d(body), "main"), (to_d(pupils), "main")],
+            "bbox": (22, 26, 234, 238), "baseline": 238,
+            "name": "ЛЕВ", "letter": "R", "idea": ""}
+
+
+def symbol_knight_mono():
+    """Моно-«РЫЦАРЬ»: силуэт шлема с прорезью забрала и золотыми глазами-островками."""
+    dome = _soft([(128, 44), (176, 62), (188, 116), (176, 176), (128, 196),
+                  (80, 176), (68, 116), (80, 62)], 14)
+    plume = _soft([(128, 20), (150, 34), (146, 58), (128, 50), (110, 58),
+                   (106, 34)], 10)
+    sil = outline_of(dome, plume, w=10)
+    visor = _soft([(84, 108), (172, 108), (168, 126), (88, 126)], 8)
+    crest = _soft([(104, 150), (152, 150), (146, 172), (110, 172)], 8)
+    body = dif(sil, uni(visor, crest))
+    eyes = uni(circle(108, 117, 6), circle(148, 117, 6))
+    return {"shapes": [(to_d(body), "main"), (to_d(eyes), "main")],
+            "bbox": (58, 12, 198, 204), "baseline": 204,
+            "name": "РЫЦАРЬ", "letter": "S", "idea": ""}

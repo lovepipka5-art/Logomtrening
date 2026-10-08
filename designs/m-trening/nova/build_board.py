@@ -29,11 +29,14 @@ PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
 def pal_light(key):
     return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
 PAL_MONO = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
-CREST = {"gemshield", "monoshield", "mane"}
+CREST = {"gemshield", "monoshield", "mane", "lion", "knight", "comiccrest"}
 MONO_SYM = {"gemshield": nl.symbol_gem_shield_mono,
           "monoshield": nl.symbol_mono_shield_mono,
-          "mane": nl.symbol_mane_roundel_mono}
-PAL_DARK_C = dict(nl.PAL_FULL, wm=nl.WHITE)
+          "mane": nl.symbol_mane_roundel_mono,
+          "lion": nl.symbol_lion_mono,
+          "knight": nl.symbol_knight_mono,
+          "comiccrest": nl.symbol_gem_shield_mono}
+PAL_DARK_C = dict(nl.PAL_FULL, wm=nl.WHITE, wmo=nl.BLUE)
 
 
 def strip(svg_str):
@@ -71,11 +74,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 9: '
-              'клубный герб уровня профессиональных команд</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 10: '
+              'комикс-маскот, серьёзный характер</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Два базовых цвета (Royal + Navy), акцент Gold, гранёный мяч-кристалл: '
-              'объём через фасеты и двойные канты — как у профессиональных клубов.</text>' % (GAP, MUTED))
+              'fill="%s">Плотный контур, сел-шейдинг и блики как в комиксах: талисман-лев '
+              'с мячом в зубах, рыцарский шлем и комикс-версия герба.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -103,7 +106,7 @@ def board(concepts, recommend):
                         cx + tw + 48, y + 24, tw - 48, tw - 48))
         y += tw + 28
         # --- горизонтальная компоновка на тёмном
-        lay = nl.lockup_h(sym, style)
+        lay = nl.lockup_h(sym, style, comic=True)
         lh = 210
         el.append(f'<rect x="{cx}" y="{y}" width="{CW}" height="{lh}" rx="24" '
                   f'fill="{PANEL}"/>')
@@ -131,9 +134,9 @@ def board(concepts, recommend):
         wmh = 110
         el.append(f'<rect x="{cx}" y="{y}" width="{CW}" height="{wmh}" rx="24" '
                   f'fill="#FFFFFF"/>')
-        d, w, wb = nl.wordmark("М-ТРЕНИНГ", style)
-        lay = {"vb": (wb[0] - 6, wb[1] - 8, (wb[2] - wb[0]) + 12, (wb[3] - wb[1]) + 16),
-               "groups": [("translate(0 0)", [(d, "wm")])]}
+        layers, w, wb = nl.wordmark_comic("М-ТРЕНИНГ", style)
+        lay = {"vb": (wb[0] - 10, wb[1] - 10, (wb[2] - wb[0]) + 26, (wb[3] - wb[1]) + 26),
+               "groups": [("translate(0 0)", layers)]}
         el.append(embed(nl.svg_from_layout(lay, nl.PAL_FULL if key in CREST else pal_light(key)),
                         cx + 40, y + 20, CW - 80, wmh - 40))
         y += wmh
@@ -167,10 +170,10 @@ def board(concepts, recommend):
 
 
 def main():
-    concepts = [("gemshield", nl.symbol_gem_shield(), "varsity"),
-                ("monoshield", nl.symbol_mono_shield(), "varsity"),
-                ("mane", nl.symbol_mane_roundel(), "varsity")]
-    svg = board(concepts, "gemshield")
+    concepts = [("lion", nl.symbol_lion_mascot(), "varsity"),
+                ("knight", nl.symbol_knight(), "varsity"),
+                ("comiccrest", nl.symbol_comic_crest(), "varsity")]
+    svg = board(concepts, "lion")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2560, 1500, os.path.join(OUT, "concepts-board.png"))
