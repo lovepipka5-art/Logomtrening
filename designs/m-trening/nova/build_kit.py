@@ -105,9 +105,9 @@ def main():
     png(nl.svg_from_layout(lv, PAL_LIGHT), 1024, int(1024 * vbv[3] / vbv[2]),
         "stacked-on-white-1024w.png", bg=nl.WHITE)
 
-    png(nl.svg_symbol(SMALL, PAL_MW), 16, 16, "favicon-16.png")
-    png(nl.svg_symbol(SMALL, PAL_MW), 32, 32, "favicon-32.png")
-    png(nl.svg_symbol(SMALL, PAL_MW), 48, 48, "favicon-48.png")
+    png(nl.svg_symbol(SMALL, PAL_MB), 16, 16, "favicon-16.png")
+    png(nl.svg_symbol(SMALL, PAL_MB), 32, 32, "favicon-32.png")
+    png(nl.svg_symbol(SMALL, PAL_MB), 48, 48, "favicon-48.png")
     ico([16, 32, 48], ["favicon-16.png", "favicon-32.png", "favicon-48.png"])
     png(nl.svg_symbol(EMB, PAL_LIGHT), 180, 180, "apple-touch-icon.png", bg=nl.WHITE)
     png(nl.svg_symbol(EMB, PAL_DEEP), 192, 192, "icon-192.png", bg=nl.DEEP)
@@ -115,7 +115,7 @@ def main():
     mask = nl.svg_symbol(EMB, PAL_BLUE).replace('viewBox="0 0 256 256"',
                                                 'viewBox="-26 -26 308 308"')
     png(mask, 512, 512, "maskable-512.png", bg=nl.BLUE)
-    png(nl.svg_symbol(SMALL, PAL_MW), 64, 64, "glyph-64.png")
+    png(nl.svg_symbol(SMALL, PAL_MB), 64, 64, "glyph-64.png")
 
     with open(os.path.join(EXP, "site.webmanifest"), "w", encoding="utf-8") as f:
         f.write('''{
