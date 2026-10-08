@@ -29,8 +29,8 @@ EMB = nl.symbol_sailpanel()
 SMALL = nl.symbol_small_sail()
 
 PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
-PAL_BLUE = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
-PAL_DEEP = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
+PAL_BLUE = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
+PAL_DEEP = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
 PAL_MW = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
 PAL_MB = {"main": nl.BLUE, "accent": nl.BLUE, "wm": nl.BLUE}
 PAL_MD = {"main": nl.DEEP, "accent": nl.DEEP, "wm": nl.DEEP}

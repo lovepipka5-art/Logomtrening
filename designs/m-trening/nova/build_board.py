@@ -20,8 +20,8 @@ GRAPHITE = "#0A1633"
 PANEL = "#12214D"
 MUTED = "#9FB0D8"
 
-PAL_ONBLUE = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
-PAL_DARK = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
+PAL_ONBLUE = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
+PAL_DARK = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
 LIGHT_ACCENT = {"goal": nl.DEEP, "panel": nl.VOLT, "ballbase": nl.DEEP,
                 "regata": nl.DEEP, "sailpanel": nl.DEEP, "orbita": nl.DEEP,
                 "horizont": nl.DEEP}
@@ -66,11 +66,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 7: '
-              'силовой слой в знаке «ГОРИЗОНТ»</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 8: '
+              'знак «ГОРИЗОНТ» в новых цветах</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Мяч-гиря с рукоятью-орбитой всходит над штангой-ватерлинией, яхта рядом; '
-              'в леттеринге varsity дефис стал мини-штангой. Футбол + силовой тренинг.</text>' % (GAP, MUTED))
+              'fill="%s">Мяч-гиря над штангой-ватерлинией, яхта рядом, дефис-штанга в леттеринге; '
+              'акцент на тёмном и синем — тёплый Sun #FFC61A, Magenta — для стритвир-мерча.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -142,18 +142,18 @@ def board(concepts, recommend):
     y = H - 150
     el.append(f'<text x="{GAP}" y="{y}" font-family="DejaVu Sans" font-size="26" '
               f'font-weight="bold" fill="#FFFFFF">Новая палитра</text>')
-    chips = [("Blue", nl.BLUE), ("Deep", nl.DEEP), ("Volt", nl.VOLT),
-             ("White", nl.WHITE)]
+    chips = [("Blue", nl.BLUE), ("Deep", nl.DEEP), ("Sun", nl.SUN),
+             ("Magenta", nl.MAGENTA), ("White", nl.WHITE)]
     x = GAP
     for name, col in chips:
         el.append(f'<rect x="{x}" y="{y+22}" width="150" height="70" rx="16" '
                   f'fill="{col}" stroke="#2A3238" stroke-width="1"/>')
         el.append(f'<text x="{x+16}" y="{y+116}" font-family="DejaVu Sans" '
                   f'font-size="20" fill="{MUTED}">{name} {col}</text>')
-        x += 170
+        x += 200
     el.append(f'<text x="{x+40}" y="{y+52}" font-family="DejaVu Sans" '
-              f'font-size="22" fill="{MUTED}">Blue — основной цвет школы; Volt — '
-              f'акцент на тёмном и на синем, на белом знак монохромный.</text>')
+              f'font-size="22" fill="{MUTED}">Blue — основной цвет школы; Sun — '
+              f'акценты на тёмном и на синем, на белом знак монохромный.</text>')
     el.append(f'<text x="{x+40}" y="{y+86}" font-family="DejaVu Sans" '
               f'font-size="22" fill="{MUTED}">Все контуры — вектор без растров и градиентов.</text>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
