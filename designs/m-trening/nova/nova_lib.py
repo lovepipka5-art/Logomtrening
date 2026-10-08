@@ -1048,3 +1048,196 @@ def symbol_horizont():
                 "гриф с дисками, яхта рядом — футбол и силовой тренинг "
                 "в одной спокойной композиции.",
     }
+
+
+# ================================================================ РАУНД 9: ГЕРБЫ
+BLUE_LITE = "#6E8CFF"
+GOLD = "#F2C230"
+GOLD_LITE = "#FFE28A"
+GOLD_DEEP = "#C08A00"
+
+
+def shield_base():
+    p = pathops.Path()
+    pen = p.getPen()
+    pen.moveTo((40, 40))
+    pen.lineTo((216, 40))
+    pen.lineTo((216, 118))
+    pen.qCurveTo((216, 192), (128, 238))
+    pen.qCurveTo((40, 192), (40, 118))
+    pen.closePath()
+    return p
+
+
+def _scaled(p, s, cx=128.0, cy=132.0):
+    return p.transform(s, 0, 0, s, cx * (1 - s), cy * (1 - s))
+
+
+def gem_ball(cx, cy, r):
+    """Гранёный мяч-кристалл: пентагон-ядро и два пояса фасетов с зазорами."""
+    out = []
+    core = poly(pentagon_pts(cx, cy, r * 0.40))
+    out.append((to_d(core), "white"))
+    for i in range(5):                     # средний пояс фасетов
+        a0 = -90 + i * 72 + 4
+        a1 = -90 + (i + 1) * 72 - 4
+        pts = arc_pts(cx, cy, r * 0.46, a0, a1, 2) + arc_pts(cx, cy, r * 0.74, a1, a0, 2)
+        out.append((to_d(poly(pts)), "lite"))
+    for i in range(5):                     # внешний пояс, в шахматном порядке
+        a0 = -54 + i * 72 + 4
+        a1 = -54 + (i + 1) * 72 - 4
+        pts = arc_pts(cx, cy, r * 0.80, a0, a1, 2) + arc_pts(cx, cy, r * 1.0, a1, a0, 2)
+        out.append((to_d(poly(pts)), "dark"))
+    return out
+
+
+def star5(cx, cy, r):
+    pts = []
+    for i in range(10):
+        rr = r if i % 2 == 0 else r * 0.46
+        a = math.pi / 5 * i - math.pi / 2
+        pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+    return poly(pts)
+
+
+def symbol_gem_shield():
+    """N «КРИСТАЛЛ»: клубный щит с гранёным мячом-кристаллом, звездой и шевроном."""
+    sh = shield_base()
+    shapes = [(to_d(sh), "gold"),
+              (to_d(_scaled(sh, 0.945)), "dark"),
+              (to_d(_scaled(sh, 0.86)), "main")]
+    field = _scaled(sh, 0.86)
+    shapes += gem_ball(128, 122, 50)
+    shapes.append((to_d(star5(128, 56, 11)), "gold"))
+    chev = poly([(52, 196), (128, 168), (204, 196), (204, 212), (128, 184), (52, 212)])
+    shapes.append((to_d(itr(chev, field)), "gold"))
+    return {
+        "shapes": shapes,
+        "bbox": (40, 40, 216, 238),
+        "baseline": 238,
+        "name": "КРИСТАЛЛ",
+        "letter": "N",
+        "idea": "Клубный щит с двойным кантом: гранёный мяч-кристалл, звезда и "
+                "золотой шеврон — объём через фасеты, как у профессиональных клубов.",
+    }
+
+
+def symbol_mono_shield():
+    """P «МОНОГРАММА»: щит с монументальной золотой «М», в седле которой — кристалл."""
+    sh = shield_base()
+    shapes = [(to_d(sh), "gold"),
+              (to_d(_scaled(sh, 0.945)), "dark"),
+              (to_d(_scaled(sh, 0.86)), "main")]
+    field = _scaled(sh, 0.86)
+    m = solid_m(64, 78, 150, 128, 26, apex_flat=0.10)
+    shadow = m.transform(1, 0, 0, 1, 5, 5)
+    shapes.append((to_d(shadow), "gold2"))
+    shapes.append((to_d(m), "gold"))
+    shapes.append((to_d(circle(128, 116, 36)), "dark"))
+    shapes += [(d, r) for d, r in gem_ball(128, 116, 30)]
+    chev = poly([(52, 196), (128, 170), (204, 196), (204, 212), (128, 186), (52, 212)])
+    shapes.append((to_d(itr(chev, field)), "gold"))
+    return {
+        "shapes": shapes,
+        "bbox": (40, 40, 216, 238),
+        "baseline": 238,
+        "name": "МОНОГРАММА",
+        "letter": "P",
+        "idea": "Щит с монументальной золотой «М» в два тона; в её седле — "
+                "гранёный мяч-кристалл: буква школы держит игру.",
+    }
+
+
+def symbol_mane_roundel():
+    """Q «ГРИВА»: круглый значок — гранёный мяч в золотой гриве из языков пламени."""
+    shapes = [(to_d(circle(128, 128, 104)), "gold"),
+              (to_d(circle(128, 128, 96)), "dark"),
+              (to_d(circle(128, 128, 84)), "main")]
+    spikes = []
+    for i in range(12):
+        a = math.radians(i * 30 + 15)
+        tip = (128 + 84 * math.cos(a), 128 + 84 * math.sin(a))
+        b0 = (128 + 46 * math.cos(a - 0.20), 128 + 46 * math.sin(a - 0.20))
+        b1 = (128 + 46 * math.cos(a + 0.20), 128 + 46 * math.sin(a + 0.20))
+        spikes.append(poly([b0, tip, b1]))
+    mane = uni(*spikes)
+    shapes.append((to_d(itr(mane, circle(128, 128, 84))), "gold"))
+    shapes += gem_ball(128, 128, 54)
+    return {
+        "shapes": shapes,
+        "bbox": (24, 24, 232, 232),
+        "baseline": 232,
+        "name": "ГРИВА",
+        "letter": "Q",
+        "idea": "Круглый значок: гранёный мяч в золотой гриве-пламени — сила и "
+                "скорость, читается как эмблема клуба с любого расстояния.",
+    }
+
+
+def symbol_gem_small():
+    """Упрощённый знак 16-48 px: гранёный мяч с зазорами-швами."""
+    shapes = gem_ball(128, 128, 104)
+    return {"shapes": [(d, "main") for d, _ in shapes],
+            "bbox": (24, 24, 232, 232), "baseline": 232,
+            "name": "КРИСТАЛЛ-МИНИ", "letter": "n", "idea": ""}
+
+
+PAL_FULL = {"main": BLUE, "lite": BLUE_LITE, "dark": DEEP, "gold": GOLD,
+            "gold2": GOLD_DEEP, "white": "#FFFFFF", "wm": BLUE}
+
+
+def _gem_cut(cx, cy, r):
+    cuts = [poly(pentagon_pts(cx, cy, r * 0.40))]
+    for i in range(5):
+        a0 = -90 + i * 72 + 4
+        a1 = -90 + (i + 1) * 72 - 4
+        cuts.append(poly(arc_pts(cx, cy, r * 0.46, a0, a1, 2) +
+                         arc_pts(cx, cy, r * 0.74, a1, a0, 2)))
+        b0 = -54 + i * 72 + 4
+        b1 = -54 + (i + 1) * 72 - 4
+        cuts.append(poly(arc_pts(cx, cy, r * 0.80, b0, b1, 2) +
+                         arc_pts(cx, cy, r * 1.0, b1, b0, 2)))
+    return uni(*cuts)
+
+
+def symbol_gem_shield_mono():
+    """Моно-«КРИСТАЛЛ»: кант щита + поле, в котором кристалл, звезда и шеврон
+    вырублены негативом — читается в один цвет на любом размере."""
+    sh = shield_base()
+    ring = dif(sh, _scaled(sh, 0.945))
+    field = _scaled(sh, 0.86)
+    chev = poly([(52, 196), (128, 168), (204, 196), (204, 212), (128, 184), (52, 212)])
+    holes = uni(_gem_cut(128, 122, 50), star5(128, 56, 11), itr(chev, field))
+    return {"shapes": [(to_d(ring), "main"), (to_d(dif(field, holes)), "main")],
+            "bbox": (40, 40, 216, 238), "baseline": 238,
+            "name": "КРИСТАЛЛ", "letter": "N", "idea": ""}
+
+
+def symbol_mono_shield_mono():
+    """Моно-«МОНОГРАММА»: кант, М, кристалл на тарелке и шеврон без поля."""
+    sh = shield_base()
+    ring = dif(sh, _scaled(sh, 0.945))
+    m = solid_m(64, 78, 150, 128, 26, apex_flat=0.10)
+    plate = dif(circle(128, 116, 36), _gem_cut(128, 116, 30))
+    chev = poly([(52, 196), (128, 170), (204, 196), (204, 212), (128, 186), (52, 212)])
+    return {"shapes": [(to_d(ring), "main"), (to_d(m), "main"),
+                       (to_d(plate), "main"), (to_d(chev), "main")],
+            "bbox": (40, 40, 216, 238), "baseline": 238,
+            "name": "МОНОГРАММА", "letter": "P", "idea": ""}
+
+
+def symbol_mane_roundel_mono():
+    """Моно-«ГРИВА»: кольцо + диск, в котором языки пламени и кристалл вырублены."""
+    ring = dif(circle(128, 128, 104), circle(128, 128, 96))
+    spikes = []
+    for i in range(12):
+        a = math.radians(i * 30 + 15)
+        tip = (128 + 84 * math.cos(a), 128 + 84 * math.sin(a))
+        b0 = (128 + 46 * math.cos(a - 0.20), 128 + 46 * math.sin(a - 0.20))
+        b1 = (128 + 46 * math.cos(a + 0.20), 128 + 46 * math.sin(a + 0.20))
+        spikes.append(poly([b0, tip, b1]))
+    field = circle(128, 128, 84)
+    holes = uni(uni(*spikes), _gem_cut(128, 128, 54))
+    return {"shapes": [(to_d(ring), "main"), (to_d(dif(field, holes)), "main")],
+            "bbox": (24, 24, 232, 232), "baseline": 232,
+            "name": "ГРИВА", "letter": "Q", "idea": ""}

@@ -18,17 +18,18 @@ MUTED = "#9FB0D8"
 PANEL = "#12214D"
 
 STYLE = "varsity"
-SYM = nl.symbol_horizont()
-SYM_MONO = SYM
-SYM_MONO_NT = SYM
-EMB = nl.symbol_sailpanel()
-SMALL = nl.symbol_small_sail()
+SYM = nl.symbol_gem_shield()
+SYM_MONO = nl.symbol_gem_shield_mono()
+SYM_MONO_NT = SYM_MONO
+EMB = nl.symbol_mane_roundel()
+EMB_MONO = nl.symbol_mane_roundel_mono()
+SMALL = nl.symbol_gem_small()
 
-PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
-PAL_BLUE = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
-PAL_DEEP = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
-PAL_MW = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
-PAL_MB = {"main": nl.BLUE, "accent": nl.BLUE, "wm": nl.BLUE}
+PAL_LIGHT = dict(nl.PAL_FULL)
+PAL_BLUE = dict(nl.PAL_FULL, wm=nl.WHITE)
+PAL_DEEP = dict(nl.PAL_FULL, wm=nl.WHITE)
+PAL_MW = {"main": nl.WHITE}
+PAL_MB = {"main": nl.BLUE}
 
 TEE = ("M140 44 C158 26 178 20 200 20 C222 20 242 26 260 44 L356 100 L312 170 "
        "L286 152 L286 396 L114 396 L114 152 L88 170 L44 100 Z")
@@ -56,10 +57,10 @@ def main():
     W, H = 2400, 1560
     el = [f'<rect width="{W}" height="{H}" fill="{nl.DEEP}"/>']
     el.append('<text x="60" y="92" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «ГОРИЗОНТ» — применение</text>')
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «КРИСТАЛЛ» — применение</text>')
     el.append('<text x="60" y="138" font-family="DejaVu Sans" font-size="26" '
               f'fill="{MUTED}">Футбольная школа силового тренинга · основной цвет '
-              'Blue #1B44D8 · мяч-гиря над штангой-ватерлинией, яхта рядом; дефис-штанга в леттеринге</text>')
+              'Royal + Navy + Gold: клубный герб с гранёным мячом-кристаллом, эмблема «Грива»</text>')
 
     TW, TH, G = 740, 620, 40
     x0, y0 = 60, 190
@@ -89,7 +90,7 @@ def main():
     y = y0 + TH + G
     # 4 — аватары
     x = x0
-    el += tile(x, y, TW, TH, "Аватары и соцсети", "эмблема «Панель-парус»")
+    el += tile(x, y, TW, TH, "Аватары и соцсети", "эмблема «Грива» для аватаров")
     el.append(f'<rect x="{x+70}" y="{y+70}" width="280" height="280" rx="64" fill="{nl.DEEP}"/>')
     el.append(embed(nl.svg_symbol(EMB, PAL_DEEP), x + 100, y + 100, 220, 220))
     el.append(f'<circle cx="{x+540}" cy="{y+210}" r="140" fill="{nl.BLUE}"/>')
@@ -97,7 +98,7 @@ def main():
 
     # 5 — favicon и вкладка
     x = x0 + TW + G
-    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-48 px: мяч с парусом")
+    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-48 px: гранёный мяч")
     el.append(f'<rect x="{x+60}" y="{y+90}" width="{TW-120}" height="120" rx="18" fill="#E8ECF6"/>')
     el.append(f'<rect x="{x+80}" y="{y+110}" width="360" height="80" rx="14" fill="#FFFFFF"/>')
     el.append(f'<g transform="translate({x+96} {y+126}) scale(0.1875)">'

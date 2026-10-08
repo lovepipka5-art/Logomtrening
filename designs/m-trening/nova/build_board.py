@@ -29,6 +29,11 @@ PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
 def pal_light(key):
     return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
 PAL_MONO = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
+CREST = {"gemshield", "monoshield", "mane"}
+MONO_SYM = {"gemshield": nl.symbol_gem_shield_mono,
+          "monoshield": nl.symbol_mono_shield_mono,
+          "mane": nl.symbol_mane_roundel_mono}
+PAL_DARK_C = dict(nl.PAL_FULL, wm=nl.WHITE)
 
 
 def strip(svg_str):
@@ -66,11 +71,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 8: '
-              'знак «ГОРИЗОНТ» в новых цветах</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 9: '
+              'клубный герб уровня профессиональных команд</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Мяч-гиря над штангой-ватерлинией, яхта рядом, дефис-штанга в леттеринге; '
-              'акцент на тёмном и синем — тёплый Sun #FFC61A, Magenta — для стритвир-мерча.</text>' % (GAP, MUTED))
+              'fill="%s">Два базовых цвета (Royal + Navy), акцент Gold, гранёный мяч-кристалл: '
+              'объём через фасеты и двойные канты — как у профессиональных клубов.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -90,20 +95,20 @@ def board(concepts, recommend):
         tw = (CW - 24) / 2
         el.append(f'<rect x="{cx}" y="{y}" width="{tw}" height="{tw}" rx="28" '
                   f'fill="{nl.BLUE}"/>')
-        el.append(embed(nl.svg_symbol(sym, PAL_ONBLUE), cx + 24, y + 24,
-                        tw - 48, tw - 48))
+        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in CREST else PAL_ONBLUE),
+                        cx + 24, y + 24, tw - 48, tw - 48))
         el.append(f'<rect x="{cx+tw+24}" y="{y}" width="{tw}" height="{tw}" '
                   f'rx="28" fill="#FFFFFF"/>')
-        el.append(embed(nl.svg_symbol(sym, pal_light(key)), cx + tw + 48, y + 24,
-                        tw - 48, tw - 48))
+        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in CREST else pal_light(key)),
+                        cx + tw + 48, y + 24, tw - 48, tw - 48))
         y += tw + 28
         # --- горизонтальная компоновка на тёмном
         lay = nl.lockup_h(sym, style)
         lh = 210
         el.append(f'<rect x="{cx}" y="{y}" width="{CW}" height="{lh}" rx="24" '
                   f'fill="{PANEL}"/>')
-        el.append(embed(nl.svg_from_layout(lay, PAL_DARK), cx + 30, y + 25,
-                        CW - 60, lh - 50))
+        el.append(embed(nl.svg_from_layout(lay, PAL_DARK_C if key in CREST else PAL_DARK),
+                        cx + 30, y + 25, CW - 60, lh - 50))
         y += lh + 24
         # --- лестница размеров (монохром на тёмном)
         lad = 150
@@ -111,7 +116,8 @@ def board(concepts, recommend):
                   f'fill="{PANEL}"/>')
         px = cx + 60
         for size in (104, 64, 40, 24, 16):
-            el.append(embed(nl.svg_symbol(sym, PAL_MONO), px, y + (lad - size) / 2 - 4,
+            msym = MONO_SYM[key]() if key in MONO_SYM else sym
+            el.append(embed(nl.svg_symbol(msym, PAL_MONO), px, y + (lad - size) / 2 - 4,
                             size, size))
             el.append(f'<text x="{px+size/2}" y="{y+lad-14}" text-anchor="middle" '
                       f'font-family="DejaVu Sans" font-size="17" fill="{MUTED}">'
@@ -128,8 +134,8 @@ def board(concepts, recommend):
         d, w, wb = nl.wordmark("М-ТРЕНИНГ", style)
         lay = {"vb": (wb[0] - 6, wb[1] - 8, (wb[2] - wb[0]) + 12, (wb[3] - wb[1]) + 16),
                "groups": [("translate(0 0)", [(d, "wm")])]}
-        el.append(embed(nl.svg_from_layout(lay, pal_light(key)), cx + 40, y + 20,
-                        CW - 80, wmh - 40))
+        el.append(embed(nl.svg_from_layout(lay, nl.PAL_FULL if key in CREST else pal_light(key)),
+                        cx + 40, y + 20, CW - 80, wmh - 40))
         y += wmh
         if key == recommend:
             el.append(f'<rect x="{cx+CW-190}" y="{180+8}" width="190" height="46" '
@@ -142,8 +148,8 @@ def board(concepts, recommend):
     y = H - 150
     el.append(f'<text x="{GAP}" y="{y}" font-family="DejaVu Sans" font-size="26" '
               f'font-weight="bold" fill="#FFFFFF">Новая палитра</text>')
-    chips = [("Blue", nl.BLUE), ("Deep", nl.DEEP), ("Sun", nl.SUN),
-             ("Magenta", nl.MAGENTA), ("White", nl.WHITE)]
+    chips = [("Royal", nl.BLUE), ("Navy", nl.DEEP), ("Gold", nl.GOLD),
+             ("Lite", nl.BLUE_LITE), ("White", nl.WHITE)]
     x = GAP
     for name, col in chips:
         el.append(f'<rect x="{x}" y="{y+22}" width="150" height="70" rx="16" '
@@ -161,10 +167,10 @@ def board(concepts, recommend):
 
 
 def main():
-    concepts = [("horizont", nl.symbol_horizont(), "varsity"),
-                ("orbita", nl.symbol_orbita(), "varsity"),
-                ("sailpanel", nl.symbol_sailpanel(), "varsity")]
-    svg = board(concepts, "horizont")
+    concepts = [("gemshield", nl.symbol_gem_shield(), "varsity"),
+                ("monoshield", nl.symbol_mono_shield(), "varsity"),
+                ("mane", nl.symbol_mane_roundel(), "varsity")]
+    svg = board(concepts, "gemshield")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2560, 1500, os.path.join(OUT, "concepts-board.png"))

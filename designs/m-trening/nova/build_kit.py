@@ -24,13 +24,15 @@ EXP = os.path.join(KIT, "exports")
 os.makedirs(EXP, exist_ok=True)
 
 STYLE = "varsity"
-SYM = nl.symbol_horizont()
-EMB = nl.symbol_sailpanel()
-SMALL = nl.symbol_small_sail()
+SYM = nl.symbol_gem_shield()
+SYM_MONO = nl.symbol_gem_shield_mono()
+EMB = nl.symbol_mane_roundel()
+EMB_MONO = nl.symbol_mane_roundel_mono()
+SMALL = nl.symbol_gem_small()
 
-PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
-PAL_BLUE = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
-PAL_DEEP = {"main": nl.WHITE, "accent": nl.SUN, "wm": nl.WHITE}
+PAL_LIGHT = dict(nl.PAL_FULL)
+PAL_BLUE = dict(nl.PAL_FULL, wm=nl.WHITE)
+PAL_DEEP = dict(nl.PAL_FULL, wm=nl.WHITE)
 PAL_MW = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
 PAL_MB = {"main": nl.BLUE, "accent": nl.BLUE, "wm": nl.BLUE}
 PAL_MD = {"main": nl.DEEP, "accent": nl.DEEP, "wm": nl.DEEP}
@@ -63,15 +65,15 @@ def ico(sizes, names):
 
 
 def main():
-    write_svg("logo-symbol.svg", nl.svg_symbol(SYM, PAL_LIGHT, "М-ТРЕНИНГ — знак «Регата»"))
+    write_svg("logo-symbol.svg", nl.svg_symbol(SYM, PAL_LIGHT, "М-ТРЕНИНГ — знак «Кристалл»"))
     write_svg("logo-symbol-on-blue.svg", nl.svg_symbol(SYM, PAL_BLUE, "М-ТРЕНИНГ — знак на синем"))
     write_svg("logo-symbol-on-dark.svg", nl.svg_symbol(SYM, PAL_DEEP, "М-ТРЕНИНГ — знак на тёмном"))
-    write_svg("logo-symbol-mono-white.svg", nl.svg_symbol(SYM, PAL_MW, "М-ТРЕНИНГ — знак монохром белый"))
-    write_svg("logo-symbol-mono-blue.svg", nl.svg_symbol(SYM, PAL_MB, "М-ТРЕНИНГ — знак монохром синий"))
-    write_svg("logo-symbol-mono-deep.svg", nl.svg_symbol(SYM, PAL_MD, "М-ТРЕНИНГ — знак монохром тёмный"))
+    write_svg("logo-symbol-mono-white.svg", nl.svg_symbol(SYM_MONO, PAL_MW, "М-ТРЕНИНГ — знак монохром белый"))
+    write_svg("logo-symbol-mono-blue.svg", nl.svg_symbol(SYM_MONO, PAL_MB, "М-ТРЕНИНГ — знак монохром синий"))
+    write_svg("logo-symbol-mono-deep.svg", nl.svg_symbol(SYM_MONO, PAL_MD, "М-ТРЕНИНГ — знак монохром тёмный"))
     write_svg("logo-emblem.svg", nl.svg_symbol(EMB, PAL_LIGHT, "М-ТРЕНИНГ — эмблема «Панель-парус»"))
     write_svg("logo-emblem-on-dark.svg", nl.svg_symbol(EMB, PAL_DEEP, "М-ТРЕНИНГ — эмблема на тёмном"))
-    write_svg("logo-emblem-mono-white.svg", nl.svg_symbol(EMB, PAL_MW, "М-ТРЕНИНГ — эмблема монохром"))
+    write_svg("logo-emblem-mono-white.svg", nl.svg_symbol(EMB_MONO, PAL_MW, "М-ТРЕНИНГ — эмблема монохром"))
     write_svg("logo-symbol-small.svg", nl.svg_symbol(SMALL, PAL_MB, "М-ТРЕНИНГ — знак 16-48 px"))
     write_svg("logo-symbol-small-mono-white.svg", nl.svg_symbol(SMALL, PAL_MW, "М-ТРЕНИНГ — знак 16-48 px"))
     write_svg("logo-horizontal.svg", nl.svg_from_layout(nl.lockup_h(SYM, STYLE), PAL_LIGHT, "М-ТРЕНИНГ"))
@@ -88,8 +90,8 @@ def main():
     png(nl.svg_symbol(SYM, PAL_BLUE), 1024, 1024, "symbol-on-blue-1024.png", bg=nl.BLUE)
     png(nl.svg_symbol(SYM, PAL_DEEP), 1024, 1024, "symbol-on-deep-1024.png", bg=nl.DEEP)
     png(nl.svg_symbol(SYM, PAL_LIGHT), 1024, 1024, "symbol-transparent-1024.png")
-    png(nl.svg_symbol(SYM, PAL_MW), 1024, 1024, "symbol-mono-white-transparent-1024.png")
-    png(nl.svg_symbol(SYM, PAL_MB), 1024, 1024, "symbol-mono-blue-transparent-1024.png")
+    png(nl.svg_symbol(SYM_MONO, PAL_MW), 1024, 1024, "symbol-mono-white-transparent-1024.png")
+    png(nl.svg_symbol(SYM_MONO, PAL_MB), 1024, 1024, "symbol-mono-blue-transparent-1024.png")
     png(nl.svg_symbol(EMB, PAL_LIGHT), 512, 512, "emblem-on-white-512.png", bg=nl.WHITE)
     png(nl.svg_symbol(EMB, PAL_DEEP), 512, 512, "emblem-on-deep-512.png", bg=nl.DEEP)
     lh = nl.lockup_h(SYM, STYLE)
