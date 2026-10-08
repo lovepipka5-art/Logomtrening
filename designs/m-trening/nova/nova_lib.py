@@ -488,12 +488,19 @@ def symbol_panel(r=104, seam_w=17, seam_r0=78, mw=118, ms=25, cap=84, base=172):
     ball = circle(cx, cy, r)
     m = solid_m(cx - mw / 2.0, cap, base, mw, ms, apex_flat=0.09)
     body = dif(ball, m)
+    # швы — сужающиеся к центру панели (трапеции), как у настоящего мяча
     seams = []
     for i in range(5):
         a = math.radians(-90 + i * 72)
-        p0 = (cx + seam_r0 * math.cos(a), cy + seam_r0 * math.sin(a))
-        p1 = (cx + r * math.cos(a), cy + r * math.sin(a))
-        seams.append(stroke_polyline([p0, p1], seam_w, "butt", "miter", 4))
+        ux, uy = math.cos(a), math.sin(a)
+        nx, ny = -uy, ux
+        w0, w1 = seam_w * 0.62, seam_w          # внутри уже, у кромки шире
+        p0 = (cx + seam_r0 * ux, cy + seam_r0 * uy)
+        p1 = (cx + (r + 2) * ux, cy + (r + 2) * uy)
+        seams.append(poly([(p0[0] + nx * w0 / 2, p0[1] + ny * w0 / 2),
+                           (p1[0] + nx * w1 / 2, p1[1] + ny * w1 / 2),
+                           (p1[0] - nx * w1 / 2, p1[1] - ny * w1 / 2),
+                           (p0[0] - nx * w0 / 2, p0[1] - ny * w0 / 2)]))
     seams_p = uni(*seams)
     seams_p = itr(seams_p, ball)
     return {
