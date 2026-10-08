@@ -16,12 +16,16 @@ sys.path.insert(0, HERE)
 import nova_lib as nl  # noqa: E402
 
 OUT = HERE
-GRAPHITE = "#0E1216"
-PANEL = "#161C22"
-MUTED = "#93A6A0"
+GRAPHITE = "#0A1633"
+PANEL = "#12214D"
+MUTED = "#9FB0D8"
 
+PAL_ONBLUE = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
 PAL_DARK = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
-PAL_LIGHT = {"main": nl.INK, "accent": nl.PITCH, "wm": nl.INK}
+LIGHT_ACCENT = {"goal": nl.DEEP, "panel": nl.VOLT, "ballbase": nl.DEEP}
+PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
+def pal_light(key):
+    return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
 PAL_MONO = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
 
 
@@ -59,12 +63,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — новый знак, '
-              'три концепции</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 2: '
+              'футбольные концепции</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Знак построен с нуля: монограмма «М» вместо прежней '
-              'композиции «мяч + парусник + орбита». Цвет, геометрия и '
-              'леттеринг — новые.</text>' % (GAP, MUTED))
+              'fill="%s">Основной цвет школы — синий. Знак построен с нуля и '
+              'не наследует прежнюю композицию «мяч + парусник + орбита».</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -83,12 +86,12 @@ def board(concepts, recommend):
         # --- два тайла: тёмный и светлый
         tw = (CW - 24) / 2
         el.append(f'<rect x="{cx}" y="{y}" width="{tw}" height="{tw}" rx="28" '
-                  f'fill="{nl.PITCH}"/>')
-        el.append(embed(nl.svg_symbol(sym, PAL_DARK), cx + 24, y + 24,
+                  f'fill="{nl.BLUE}"/>')
+        el.append(embed(nl.svg_symbol(sym, PAL_ONBLUE), cx + 24, y + 24,
                         tw - 48, tw - 48))
         el.append(f'<rect x="{cx+tw+24}" y="{y}" width="{tw}" height="{tw}" '
                   f'rx="28" fill="#FFFFFF"/>')
-        el.append(embed(nl.svg_symbol(sym, PAL_LIGHT), cx + tw + 48, y + 24,
+        el.append(embed(nl.svg_symbol(sym, pal_light(key)), cx + tw + 48, y + 24,
                         tw - 48, tw - 48))
         y += tw + 28
         # --- горизонтальная компоновка на тёмном
@@ -122,7 +125,7 @@ def board(concepts, recommend):
         d, w, wb = nl.wordmark("М-ТРЕНИНГ", style)
         lay = {"vb": (wb[0] - 6, wb[1] - 8, (wb[2] - wb[0]) + 12, (wb[3] - wb[1]) + 16),
                "groups": [("translate(0 0)", [(d, "wm")])]}
-        el.append(embed(nl.svg_from_layout(lay, PAL_LIGHT), cx + 40, y + 20,
+        el.append(embed(nl.svg_from_layout(lay, pal_light(key)), cx + 40, y + 20,
                         CW - 80, wmh - 40))
         y += wmh
         if key == recommend:
@@ -136,7 +139,7 @@ def board(concepts, recommend):
     y = H - 150
     el.append(f'<text x="{GAP}" y="{y}" font-family="DejaVu Sans" font-size="26" '
               f'font-weight="bold" fill="#FFFFFF">Новая палитра</text>')
-    chips = [("Ink", nl.INK), ("Pitch", nl.PITCH), ("Volt", nl.VOLT),
+    chips = [("Blue", nl.BLUE), ("Deep", nl.DEEP), ("Volt", nl.VOLT),
              ("White", nl.WHITE)]
     x = GAP
     for name, col in chips:
@@ -146,8 +149,8 @@ def board(concepts, recommend):
                   f'font-size="20" fill="{MUTED}">{name} {col}</text>')
         x += 170
     el.append(f'<text x="{x+40}" y="{y+52}" font-family="DejaVu Sans" '
-              f'font-size="22" fill="{MUTED}">Volt — акцент только на тёмном; '
-              f'на светлом фоне знак работает монохромом Ink.</text>')
+              f'font-size="22" fill="{MUTED}">Blue — основной цвет школы; Volt — '
+              f'акцент на тёмном и на синем, на белом знак монохромный.</text>')
     el.append(f'<text x="{x+40}" y="{y+86}" font-family="DejaVu Sans" '
               f'font-size="22" fill="{MUTED}">Все контуры — вектор без текста, '
               f'растров и градиентов; вышивка, флекс, шелкография.</text>')
@@ -156,10 +159,10 @@ def board(concepts, recommend):
 
 
 def main():
-    concepts = [("pulse", nl.symbol_pulse(), "pulse"),
-                ("srez", nl.symbol_srez(), "srez"),
-                ("penta", nl.symbol_penta(), "penta")]
-    svg = board(concepts, "penta")
+    concepts = [("goal", nl.symbol_goal(), "srez"),
+                ("panel", nl.symbol_panel(), "pulse"),
+                ("ballbase", nl.symbol_ballbase(), "penta")]
+    svg = board(concepts, "ballbase")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2680, 1500, os.path.join(OUT, "concepts-board.png"))

@@ -27,9 +27,11 @@ import pathops
 from fontTools.pens.svgPathPen import SVGPathPen
 
 # ---------------------------------------------------------------- палитра
-INK = "#12161C"      # чернильный — основной на светлом фоне
-PITCH = "#0B3B2C"    # тёмная зелень поля — фон и тёмная версия
-VOLT = "#D8F74E"     # вольтовый акцент (только на тёмном)
+INK = "#12161C"      # чернильный (раунд 1)
+PITCH = "#0B3B2C"    # тёмная зелень поля (раунд 1)
+BLUE = "#1B44D8"     # основной цвет школы — королевский синий
+DEEP = "#0A1633"     # ночной синий — тёмные поверхности
+VOLT = "#D8F74E"     # вольтовый акцент (только на тёмном / на синем)
 WHITE = "#FFFFFF"
 
 K = 0.5522847498307936  # каппа для кубических дуг окружности
@@ -144,6 +146,21 @@ def cbar(x, y, w, h, c=0, corners=()):
     if not idx or not c:
         return poly(pts)
     return chamfer_poly(pts, idx, c)
+
+
+def stroke_polyline(points, w, cap="butt", join="miter", miter=6.0):
+    """Полилиния -> заполненный контур заданной толщины."""
+    p = pathops.Path()
+    pen = p.getPen()
+    pen.moveTo(tuple(points[0]))
+    for pt in points[1:]:
+        pen.lineTo(tuple(pt))
+    caps = {"butt": pathops.LineCap.BUTT_CAP, "round": pathops.LineCap.ROUND_CAP,
+            "square": pathops.LineCap.SQUARE_CAP}[cap]
+    joins = {"miter": pathops.LineJoin.MITER_JOIN, "round": pathops.LineJoin.ROUND_JOIN,
+             "bevel": pathops.LineJoin.BEVEL_JOIN}[join]
+    p.stroke(w, caps, joins, miter)
+    return p
 
 
 # ---------------------------------------------------------------- булевы
@@ -437,3 +454,80 @@ def render(svg_str, w, h, out, bg=None):
     with open(out, "wb") as f:
         f.write(bytes(data))
     return out
+
+# ================================================================ РАУНД 2: ФУТБОЛ
+def symbol_goal(t=22, x0=36, x1=220, top=52, ground=204, ball_r=30):
+    """D «ГОЛ»: штанги ворот, прогиб сетки и мяч в сетке.
+
+    Силуэт читается и как сцена «мяч в сетке», и как буква «М»
+    (штанги — стволы, прогиб сетки — средний зуб).
+    """
+    bar_h = t
+    left_post = rect(x0, top, t, ground - top)
+    right_post = rect(x1 - t, top, t, ground - top)
+    crossbar = rect(x0, top, x1 - x0, bar_h)
+    frame = uni(left_post, right_post, crossbar)
+    cx = (x0 + x1) / 2.0
+    net = stroke_polyline([(x0 + t, top + bar_h), (cx, ground - 46),
+                           (x1 - t, top + bar_h)], 17, "butt", "miter", 8)
+    ball = dif(circle(cx, ground - 30, ball_r), pentagon(cx, ground - 30, 15))
+    return {
+        "shapes": [(to_d(uni(frame, net)), "main"), (to_d(ball), "accent")],
+        "bbox": (x0, top, x1, ground),
+        "baseline": ground,
+        "name": "ГОЛ",
+        "letter": "D",
+        "idea": "Штанги ворот и прогиб сетки от удара: мяч уже в сетке — "
+                "сила удара видна без слов. Силуэт читается и как «М».",
+    }
+
+
+def symbol_panel(r=104, seam_w=17, seam_r0=78, mw=118, ms=25, cap=84, base=172):
+    """E «ПАНЕЛЬ»: мяч, у которого вместо центральной панели — буква «М»."""
+    cx = cy = 128.0
+    ball = circle(cx, cy, r)
+    m = solid_m(cx - mw / 2.0, cap, base, mw, ms, apex_flat=0.09)
+    body = dif(ball, m)
+    seams = []
+    for i in range(5):
+        a = math.radians(-90 + i * 72)
+        p0 = (cx + seam_r0 * math.cos(a), cy + seam_r0 * math.sin(a))
+        p1 = (cx + r * math.cos(a), cy + r * math.sin(a))
+        seams.append(stroke_polyline([p0, p1], seam_w, "butt", "miter", 4))
+    seams_p = uni(*seams)
+    seams_p = itr(seams_p, ball)
+    return {
+        "shapes": [(to_d(body), "main"), (to_d(seams_p), "accent")],
+        "bbox": (cx - r, cy - r, cx + r, cy + r),
+        "baseline": cy + r,
+        "name": "ПАНЕЛЬ",
+        "letter": "E",
+        "idea": "Мяч, у которого центральная панель заменена вырубленной «М»: "
+                "буква буквально вшита в рисунок мяча, пять швов на месте.",
+    }
+
+
+def symbol_ballbase(x0=36, cap=42, base=214, w=184, s=32, r=40, hole=19):
+    """F «МЯЧ-В-БУКВЕ»: в основании «М» — мяч-блин (круг с пентагоном).
+
+    Круг с пентагоном внутри читается и как панель мяча, и как диск штанги:
+    футбол + силовой тренинг в одной фигуре.
+    """
+    cx = x0 + w / 2.0
+    cy = base - r
+    left_arm = poly([(x0, cap), (x0 + s, cap), (cx, cy - 10), (cx - 34, cy + 6)])
+    right_arm = poly([(x0 + w, cap), (x0 + w - s, cap), (cx, cy - 10), (cx + 34, cy + 6)])
+    left_stem = rect(x0, cap, s, base - cap)
+    right_stem = rect(x0 + w - s, cap, s, base - cap)
+    body = uni(left_stem, left_arm, right_arm, right_stem)
+    ball = dif(circle(cx, cy, r), pentagon(cx, cy, hole))
+    return {
+        "shapes": [(to_d(body), "main"), (to_d(ball), "accent")],
+        "bbox": (x0, cap, x0 + w, base),
+        "baseline": base,
+        "name": "МЯЧ-В-БУКВЕ",
+        "letter": "F",
+        "idea": "В основании «М» — мяч-блин: круг с пентагоном внутри читается "
+                "и как мяч, и как диск штанги. Футбол и сила в одной фигуре.",
+    }
+
