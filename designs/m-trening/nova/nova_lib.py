@@ -160,6 +160,7 @@ def stroke_polyline(points, w, cap="butt", join="miter", miter=6.0):
     joins = {"miter": pathops.LineJoin.MITER_JOIN, "round": pathops.LineJoin.ROUND_JOIN,
              "bevel": pathops.LineJoin.BEVEL_JOIN}[join]
     p.stroke(w, caps, joins, miter)
+    p.convertConicsToQuads()
     return p
 
 
@@ -791,3 +792,122 @@ def symbol_strike():
         "idea": "Мяч-М в момент удара: диагональное поле, вспышка за мячом и "
                 "три штриха скорости — движение и сила без единого слова.",
     }
+
+
+# ================================================================ РАУНД 4: ЭВОЛЮЦИЯ ИСХОДНОГО ЗНАКА
+def arc_pts(cx, cy, r, a0, a1, n=14):
+    pts = []
+    for i in range(n + 1):
+        a = math.radians(a0 + (a1 - a0) * i / n)
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def banana(cx, cy, r, a0, a1, w):
+    """Панель мяча — толстая дуга со скруглёнными торцами."""
+    return stroke_polyline(arc_pts(cx, cy, r, a0, a1), w, "round", "round", 4)
+
+
+def rounded_pentagon(cx, cy, r, w=9, rot=-12):
+    pts = pentagon_pts(cx, cy, r)
+    if rot:
+        pts = [(cx + (p[0] - cx) * math.cos(math.radians(rot)) -
+                 (p[1] - cy) * math.sin(math.radians(rot)),
+                cy + (p[0] - cx) * math.sin(math.radians(rot)) +
+                 (p[1] - cy) * math.cos(math.radians(rot))) for p in pts]
+    p = stroke_polyline(pts + [pts[0]], w, "round", "round", 4)
+    return uni(p, poly(pts))
+
+
+def boat(scale=1.0):
+    """Парусник: ровная мачта, два паруса с ветровым изгибом, два флажка."""
+    hull = poly([(-38, -2), (34, -2), (24, 14), (-28, 14)])
+    mast = rect(-2, -60, 4, 60)
+    main_s = pathops.Path()
+    pen = main_s.getPen()
+    pen.moveTo((3, -56))
+    pen.qCurveTo((30, -40), (34, -6))
+    pen.lineTo((3, -6))
+    pen.closePath()
+    jib = pathops.Path()
+    pen = jib.getPen()
+    pen.moveTo((-3, -48))
+    pen.qCurveTo((-25, -32), (-29, -6))
+    pen.lineTo((-3, -6))
+    pen.closePath()
+    flag_top = poly([(2, -60), (16, -55), (2, -50)])
+    flag_stern = poly([(-36, -2), (-50, -9), (-36, -16)])
+    b = uni(hull, mast, main_s, jib, flag_top, flag_stern)
+    if scale != 1.0:
+        b = b.transform(scale, 0, 0, scale, 0, 0)
+    return b
+
+
+def symbol_regata():
+    """J «РЕГАТА»: эволюция исходного знака — сфера мяча с чистыми панелями,
+    одна орбита-волна (заострённые концы) и парусник с ровной мачтой."""
+    bx, by, br = 108, 152, 78
+    panels = [rounded_pentagon(bx, by, 30, w=7)]
+    for i in range(5):                      # средний пояс панелей
+        a = -90 + i * 72
+        panels.append(banana(bx, by, 54, a - 17, a + 17, 24))
+    for i in range(5):                      # крайний пояс, в шахматном порядке
+        a = -54 + i * 72
+        panels.append(banana(bx, by, 75, a - 22, a + 22, 8))
+    ball = itr(uni(*panels), circle(bx, by, br))
+    # орбита-волна: лента с заострёнными концами, левое крыло -> волна под boat
+    wave = pathops.Path()
+    pen = wave.getPen()
+    pen.moveTo((14, 142))
+    pen.qCurveTo((52, 40), (126, 36))
+    pen.qCurveTo((190, 34), (210, 64))
+    pen.qCurveTo((190, 52), (126, 54))
+    pen.qCurveTo((60, 58), (14, 142))
+    pen.closePath()
+    bt = boat(0.85)
+    bt = bt.transform(1, 0, 0, 1, 188, 56)
+    return {
+        "shapes": [(to_d(ball), "main"), (to_d(wave), "accent"),
+                   (to_d(bt), "main")],
+        "bbox": (14, 6, 240, 230),
+        "baseline": 230,
+        "name": "РЕГАТА",
+        "letter": "J",
+        "idea": "Эволюция исходного знака: сфера мяча с чистыми панелями, одна "
+                "орбита, которая становится волной, и парусник с ровной мачтой "
+                "на её крыле. Ничего лишнего, ничего кривого.",
+    }
+
+
+def symbol_sailpanel():
+    """K «ПАНЕЛЬ-ПАРУС»: мяч, у которого центральная панель — парусник."""
+    cx = cy = 128.0
+    r = 104.0
+    cuts = [banana(cx, cy, 66, a - 20, a + 20, 15) for a in (-90, -18, 54, 126, 198)]
+    bt = boat(1.05)
+    bt = bt.transform(1, 0, 0, 1, cx, cy + 16)
+    body = dif(circle(cx, cy, r), uni(*cuts))
+    return {
+        "shapes": [(to_d(body), "main"), (to_d(bt), "accent")],
+        "bbox": (24, 24, 232, 232),
+        "baseline": 232,
+        "name": "ПАНЕЛЬ-ПАРУС",
+        "letter": "K",
+        "idea": "Мяч, у которого центральная панель вырублена силуэтом "
+                "парусника: два героя старого знака сплавлены в одну фигуру.",
+    }
+
+
+def symbol_small_sail():
+    """Упрощённый знак для 16-48 px: мяч с вырубным парусом."""
+    cx = cy = 128.0
+    sail = pathops.Path()
+    pen = sail.getPen()
+    pen.moveTo((cx - 6, cy - 62))
+    pen.qCurveTo((cx + 40, cy - 34), (cx + 46, cy + 20))
+    pen.lineTo((cx - 6, cy + 20))
+    pen.closePath()
+    hull = rect(cx - 40, cy + 30, 84, 16)
+    return {"shapes": [(to_d(dif(dif(circle(cx, cy, 104), sail), hull)), "main")],
+            "bbox": (24, 24, 232, 232), "baseline": 232, "name": "М", "letter": "M",
+            "idea": ""}

@@ -22,7 +22,8 @@ MUTED = "#9FB0D8"
 
 PAL_ONBLUE = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
 PAL_DARK = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
-LIGHT_ACCENT = {"goal": nl.DEEP, "panel": nl.VOLT, "ballbase": nl.DEEP}
+LIGHT_ACCENT = {"goal": nl.DEEP, "panel": nl.VOLT, "ballbase": nl.DEEP,
+                "regata": nl.DEEP, "sailpanel": nl.DEEP}
 PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
 def pal_light(key):
     return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
@@ -59,15 +60,16 @@ def wrap(text, limit):
 def board(concepts, recommend):
     CW = 800
     GAP = 40
-    W = 3 * CW + 4 * GAP
+    n = len(concepts)
+    W = n * CW + (n + 1) * GAP
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 2: '
-              'футбольные концепции</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 4: '
+              'эволюция исходного знака</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Основной цвет школы — синий. Знак построен с нуля и '
-              'не наследует прежнюю композицию «мяч + парусник + орбита».</text>' % (GAP, MUTED))
+              'fill="%s">ДНК старого знака — мяч, парусник, орбита — собрана заново: '
+              'ровная мачта, чистые панели, одна орбита-волна.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -79,10 +81,10 @@ def board(concepts, recommend):
         el.append(f'<text x="{cx+44}" y="{y+40}" font-family="DejaVu Sans" '
                   f'font-size="40" font-weight="bold" fill="#FFFFFF">'
                   f'«{sym["name"]}»</text>')
-        for j, line in enumerate(wrap(sym["idea"], 52)):
+        for j, line in enumerate(wrap(sym["idea"], 60)):
             el.append(f'<text x="{cx}" y="{y+84+j*34}" font-family="DejaVu Sans" '
                       f'font-size="24" fill="{MUTED}">{line}</text>')
-        y += 168
+        y += 176
         # --- два тайла: тёмный и светлый
         tw = (CW - 24) / 2
         el.append(f'<rect x="{cx}" y="{y}" width="{tw}" height="{tw}" rx="28" '
@@ -152,17 +154,15 @@ def board(concepts, recommend):
               f'font-size="22" fill="{MUTED}">Blue — основной цвет школы; Volt — '
               f'акцент на тёмном и на синем, на белом знак монохромный.</text>')
     el.append(f'<text x="{x+40}" y="{y+86}" font-family="DejaVu Sans" '
-              f'font-size="22" fill="{MUTED}">Все контуры — вектор без текста, '
-              f'растров и градиентов; вышивка, флекс, шелкография.</text>')
+              f'font-size="22" fill="{MUTED}">Все контуры — вектор без растров и градиентов.</text>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
             f'width="{W}" height="{H}">' + "".join(el) + "</svg>")
 
 
 def main():
-    concepts = [("goal", nl.symbol_goal(), "srez"),
-                ("panel", nl.symbol_panel(), "pulse"),
-                ("ballbase", nl.symbol_ballbase(), "penta")]
-    svg = board(concepts, "ballbase")
+    concepts = [("regata", nl.symbol_regata(), "penta"),
+                ("sailpanel", nl.symbol_sailpanel(), "penta")]
+    svg = board(concepts, "regata")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2680, 1500, os.path.join(OUT, "concepts-board.png"))
