@@ -290,7 +290,8 @@ STYLES = {
     "penta": dict(sw=18, tr=8.5, ch=0, m_drop=0, penta_hyphen=True, bowl=28,
                   widths=dict(M=94, T=84, R=74, E=70, H=86, I=88, G=68, hy=36,
                           Sh=102, K=84, O=96, L=84, A=92, S=82, B=82)),
-    "varsity": dict(sw=17, tr=13, ch=0, m_drop=0, penta_hyphen=True, bowl=27,
+    "varsity": dict(sw=17, tr=13, ch=0, m_drop=0, penta_hyphen=False,
+                    barbell_hyphen=True, bowl=27,
                     slab=True,
                     widths=dict(M=92, T=80, R=72, E=66, H=84, I=86, G=66, hy=36,
                                 Sh=100, K=82, O=94, L=82, A=90, S=80, B=80)),
@@ -444,6 +445,11 @@ def _glyph_core(key, st):
         pen.lineTo((sw, 100 - sw)); pen.closePath()
         return uni(stem, dif(top, hole1), dif(bot, hole2)), W
     if key == "-":
+        if st.get("barbell_hyphen"):
+            bar = rounded_rect(4, 50, W - 8, 9, 4)
+            pl = rounded_rect(0, 40, 8, 29, 3)
+            pr = rounded_rect(W - 8, 40, 8, 29, 3)
+            return uni(bar, pl, pr), W
         if st["penta_hyphen"]:
             return pentagon(W / 2.0, 54, 16), W
         return cbar(0, 54 - sw / 2.0, W, sw, max(2, c // 2),
@@ -1019,19 +1025,23 @@ def symbol_horizont():
         a = -54 + i * 72
         panels.append(banana(bx, by, 70, a - 19, a + 19, 8))
     ball = itr(uni(*panels), circle(bx, by, br))
-    water = stroke_polyline([(16, 198), (240, 198)], 10, "round", "round", 1)
-    arc = banana(bx, by, 92, 192, 332, 10)  # дуга орбиты над мячом
+    handle = banana(bx, by, 79, 215, 325, 18)     # рукоять гири = дуга орбиты
+    ball = uni(ball, handle)
+    bar = stroke_polyline([(16, 198), (240, 198)], 10, "round", "round", 1)
+    pl_l = rounded_rect(6, 176, 11, 44, 5)        # диски штанги на торцах грифа
+    pl_r = rounded_rect(239, 176, 11, 44, 5)
+    barbell = uni(bar, pl_l, pl_r)
     bt = boat3(0.75)
-    bt = bt.transform(1, 0, 0, 1, 206, 184)
+    bt = bt.transform(1, 0, 0, 1, 204, 184)
     return {
         "shapes": [(to_d(ball), "main"),
-                   (to_d(uni(water, arc)), "accent"),
+                   (to_d(barbell), "accent"),
                    (to_d(bt), "main")],
-        "bbox": (5, 29, 245, 203),
-        "baseline": 203,
+        "bbox": (6, 38, 250, 220),
+        "baseline": 220,
         "name": "ГОРИЗОНТ",
         "letter": "M",
-        "idea": "Мяч всходит над ватерлинией, яхта идёт рядом по воде, дуга "
-                "орбиты — над мячом: старые герои в спокойной горизонтальной "
-                "композиции с сильной базовой линией.",
+        "idea": "Мяч-гиря всходит над штангой-ватерлинией: рукоять-орбита, "
+                "гриф с дисками, яхта рядом — футбол и силовой тренинг "
+                "в одной спокойной композиции.",
     }

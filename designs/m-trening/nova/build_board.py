@@ -66,11 +66,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 6: '
-              'новый знак «ГОРИЗОНТ» и новый леттеринг</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 7: '
+              'силовой слой в знаке «ГОРИЗОНТ»</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Мяч всходит над ватерлинией, яхта идёт по воде, дуга орбиты над мячом; '
-              'леттеринг «М-ТРЕНИНГ» перерисован в collegiate-стиле varsity со слэбами.</text>' % (GAP, MUTED))
+              'fill="%s">Мяч-гиря с рукоятью-орбитой всходит над штангой-ватерлинией, яхта рядом; '
+              'в леттеринге varsity дефис стал мини-штангой. Футбол + силовой тренинг.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
