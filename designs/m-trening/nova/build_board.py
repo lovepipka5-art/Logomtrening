@@ -23,7 +23,8 @@ MUTED = "#9FB0D8"
 PAL_ONBLUE = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
 PAL_DARK = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
 LIGHT_ACCENT = {"goal": nl.DEEP, "panel": nl.VOLT, "ballbase": nl.DEEP,
-                "regata": nl.DEEP, "sailpanel": nl.DEEP, "orbita": nl.DEEP}
+                "regata": nl.DEEP, "sailpanel": nl.DEEP, "orbita": nl.DEEP,
+                "horizont": nl.DEEP}
 PAL_LIGHT = {"main": nl.BLUE, "accent": nl.DEEP, "wm": nl.BLUE}
 def pal_light(key):
     return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
@@ -65,11 +66,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 5: '
-              'исходный знак, пересобранный по правилам</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 6: '
+              'новый знак «ГОРИЗОНТ» и новый леттеринг</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">ДНК старого знака сохранена — мяч, две дуги орбиты, трёхпарусник, '
-              'леттеринг ниже — но мачты вертикальны, панели по сетке, дуги одной толщины.</text>' % (GAP, MUTED))
+              'fill="%s">Мяч всходит над ватерлинией, яхта идёт по воде, дуга орбиты над мячом; '
+              'леттеринг «М-ТРЕНИНГ» перерисован в collegiate-стиле varsity со слэбами.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -160,10 +161,10 @@ def board(concepts, recommend):
 
 
 def main():
-    concepts = [("orbita", nl.symbol_orbita(), "penta"),
-                ("regata", nl.symbol_regata(), "penta"),
-                ("sailpanel", nl.symbol_sailpanel(), "penta")]
-    svg = board(concepts, "orbita")
+    concepts = [("horizont", nl.symbol_horizont(), "varsity"),
+                ("orbita", nl.symbol_orbita(), "varsity"),
+                ("sailpanel", nl.symbol_sailpanel(), "varsity")]
+    svg = board(concepts, "horizont")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2560, 1500, os.path.join(OUT, "concepts-board.png"))

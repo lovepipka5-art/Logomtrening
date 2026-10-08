@@ -290,14 +290,44 @@ STYLES = {
     "penta": dict(sw=18, tr=8.5, ch=0, m_drop=0, penta_hyphen=True, bowl=28,
                   widths=dict(M=94, T=84, R=74, E=70, H=86, I=88, G=68, hy=36,
                           Sh=102, K=84, O=96, L=84, A=92, S=82, B=82)),
+    "varsity": dict(sw=17, tr=13, ch=0, m_drop=0, penta_hyphen=True, bowl=27,
+                    slab=True,
+                    widths=dict(M=92, T=80, R=72, E=66, H=84, I=86, G=66, hy=36,
+                                Sh=100, K=82, O=94, L=82, A=90, S=80, B=80)),
 }
 
 GLYPH_KEYS = {"М": "M", "Т": "T", "Р": "R", "Е": "E", "Н": "H", "И": "I",
               "Г": "G", "-": "-", "Ш": "Sh", "К": "K", "О": "O", "Л": "L",
               "А": "A", "С": "S", "В": "B", " ": " "}
 
+# Слэбы (колоджевые serif-пластины) на торцах штамбов для стиля varsity.
+# Элемент кортежа может быть числом или строкой-выражением от W и sw.
+SLAB_RECTS = {
+    "M": [(-5, 0, "sw+5", 10), (-5, 90, "sw+5", 10),
+          ("W-sw-5", 0, "sw+5", 10), ("W-sw-5", 90, "sw+5", 10)],
+    "H": [(-5, 0, "sw+5", 10), (-5, 90, "sw+5", 10),
+          ("W-sw-5", 0, "sw+5", 10), ("W-sw-5", 90, "sw+5", 10)],
+    "I": [(-5, 0, "sw+5", 10), (-5, 90, "sw+5", 10),
+          ("W-sw-5", 0, "sw+5", 10), ("W-sw-5", 90, "sw+5", 10)],
+    "T": [("(W-sw)/2-5", 90, "sw+10", 10)],
+    "R": [(-5, 0, "sw+5", 10), (-5, 90, "sw+5", 10)],
+    "G": [(-5, 90, "sw+5", 10)],
+}
+
 
 def _glyph(key, st):
+    """Глиф кегля 100; для стиля varsity добавляет слэбы на торцах штамбов."""
+    g, W = _glyph_core(key, st)
+    if g is not None and st.get("slab"):
+        sw = st["sw"]
+        for rx, ry, rw, rh in SLAB_RECTS.get(key, []):
+            x = eval(rx, {"W": W, "sw": sw}) if isinstance(rx, str) else rx
+            w = eval(rw, {"W": W, "sw": sw}) if isinstance(rw, str) else rw
+            g = uni(g, rect(x, ry, w, rh))
+    return g, W
+
+
+def _glyph_core(key, st):
     """Возвращает (path, advance) глифа в сетке кегля 100."""
     if key == " ":
         return None, 45
@@ -453,7 +483,7 @@ def lockup_h(sym, style, text="М-ТРЕНИНГ"):
     ws = hc / 100.0
     wx = sym_w + 0.55 * hc - wb[0] * ws
     wy = base_y - hc - wb[1] * ws
-    total = wx + wb[0] * ws + ink_w * ws
+    total = wx + wb[0] * ws + ink_w * ws + 8
     return {
         "vb": (0, 0, math.ceil(total), int(H)),
         "groups": [
@@ -973,4 +1003,35 @@ def symbol_orbita():
         "letter": "L",
         "idea": "Исходный знак школы, пересобранный по правилам: мяч, две дуги "
                 "орбиты и трёхпарусник — мачты вертикальны, панели по сетке.",
+    }
+
+
+def symbol_horizont():
+    """M «ГОРИЗОНТ»: мяч всходит над ватерлинией, яхта идёт рядом по воде,
+    дуга орбиты — над мячом. Старые герои в спокойной горизонтальной
+    композиции: сильная базовая линия, ничего наклонного."""
+    bx, by, br = 100, 126, 74
+    panels = [rounded_pentagon(bx, by, 29, w=8, rot=0)]
+    for i in range(5):                      # средний пояс панелей
+        a = -90 + i * 72
+        panels.append(banana(bx, by, 51, a - 15, a + 15, 23))
+    for i in range(5):                      # крайний пояс, в шахматном порядке
+        a = -54 + i * 72
+        panels.append(banana(bx, by, 70, a - 19, a + 19, 8))
+    ball = itr(uni(*panels), circle(bx, by, br))
+    water = stroke_polyline([(16, 198), (240, 198)], 10, "round", "round", 1)
+    arc = banana(bx, by, 92, 192, 332, 10)  # дуга орбиты над мячом
+    bt = boat3(0.75)
+    bt = bt.transform(1, 0, 0, 1, 206, 184)
+    return {
+        "shapes": [(to_d(ball), "main"),
+                   (to_d(uni(water, arc)), "accent"),
+                   (to_d(bt), "main")],
+        "bbox": (5, 29, 245, 203),
+        "baseline": 203,
+        "name": "ГОРИЗОНТ",
+        "letter": "M",
+        "idea": "Мяч всходит над ватерлинией, яхта идёт рядом по воде, дуга "
+                "орбиты — над мячом: старые герои в спокойной горизонтальной "
+                "композиции с сильной базовой линией.",
     }
