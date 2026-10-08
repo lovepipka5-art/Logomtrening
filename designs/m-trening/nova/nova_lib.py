@@ -281,19 +281,25 @@ def symbol_penta(x0=36, cap=42, base=214, w=184, s=32, r=40):
 # Сетка: кегль 100 (cap height), базовая линия y=100.
 STYLES = {
     "pulse": dict(sw=15, tr=7.5, ch=0, m_drop=15, penta_hyphen=False, bowl=27,
-                  widths=dict(M=88, T=78, R=71, E=66, H=80, I=82, G=64, hy=26)),
+                  widths=dict(M=88, T=78, R=71, E=66, H=80, I=82, G=64, hy=26,
+                          Sh=96, K=78, O=92, L=78, A=86, S=78, B=78)),
     "srez": dict(sw=19, tr=9.5, ch=7, m_drop=0, penta_hyphen=False, bowl=28,
-                 widths=dict(M=96, T=86, R=75, E=72, H=88, I=90, G=70, hy=30)),
+                 widths=dict(M=96, T=86, R=75, E=72, H=88, I=90, G=70, hy=30,
+                         Sh=104, K=86, O=98, L=86, A=94, S=84, B=84)),
     "penta": dict(sw=18, tr=8.5, ch=0, m_drop=0, penta_hyphen=True, bowl=28,
-                  widths=dict(M=94, T=84, R=74, E=70, H=86, I=88, G=68, hy=36)),
+                  widths=dict(M=94, T=84, R=74, E=70, H=86, I=88, G=68, hy=36,
+                          Sh=102, K=84, O=96, L=84, A=92, S=82, B=82)),
 }
 
 GLYPH_KEYS = {"М": "M", "Т": "T", "Р": "R", "Е": "E", "Н": "H", "И": "I",
-              "Г": "G", "-": "-"}
+              "Г": "G", "-": "-", "Ш": "Sh", "К": "K", "О": "O", "Л": "L",
+              "А": "A", "С": "S", "В": "B", " ": " "}
 
 
 def _glyph(key, st):
     """Возвращает (path, advance) глифа в сетке кегля 100."""
+    if key == " ":
+        return None, 45
     sw, c = st["sw"], st["ch"]
     W = st["widths"]["hy" if key == "-" else key]
     mid = (100 - sw) / 2.0
@@ -344,6 +350,68 @@ def _glyph(key, st):
         bar = cbar(0, 0, W, sw, c, ("tl", "tr"))
         stem = cbar(0, 0, sw, 100, c, ("bl", "br"))
         return uni(bar, stem), W
+    if key == "Sh":
+        l = cbar(0, 0, sw, 100, c, ("tl", "bl"))
+        m = cbar((W - sw) / 2.0, 0, sw, 100, c)
+        r = cbar(W - sw, 0, sw, 100, c, ("tr", "br"))
+        return uni(l, m, r, rect(0, 100 - sw, W, sw)), W
+    if key == "K":
+        stem = cbar(0, 0, sw, 100, c, ("tl", "bl"))
+        up = poly([(sw, 52), (sw, 30), (W, 0), (W, 22)])
+        lo = poly([(sw, 48), (sw, 70), (W, 100), (W, 78)])
+        return uni(stem, up, lo), W
+    if key == "O":
+        outer = rounded_rect(0, 0, W, 100, 40)
+        inner = rounded_rect(sw, sw, W - 2 * sw, 100 - 2 * sw, 40 - sw)
+        return dif(outer, inner), W
+    if key == "L":
+        xt = W * 0.30
+        pts = [(0, 100), (xt, 0), (W, 0), (W, sw * 1.0 + 0), (xt + sw * 1.30, sw),
+               (sw * 1.25, 100)]
+        pts = [(0, 100), (xt, 0), (W, 0), (W, sw), (xt + sw * 1.30, sw),
+               (sw * 1.25, 100)]
+        return chamfer_poly(pts, [2], c) if c else poly(pts), W
+    if key == "A":
+        left = poly([(0, 100), (W / 2 - sw / 2, 0), (W / 2 + sw / 2, 0), (sw, 100)])
+        right = poly([(W, 100), (W / 2 + sw / 2, 0), (W / 2 - sw / 2, 0), (W - sw, 100)])
+        bar = rect(W * 0.16, 60, W * 0.68, sw)
+        return uni(left, right, bar), W
+    if key == "S":
+        outer = rounded_rect(0, 0, W, 100, 40)
+        inner = rounded_rect(sw, sw, W - 2 * sw, 100 - 2 * sw, 40 - sw)
+        ring = dif(outer, inner)
+        cut = dif(rect(W - 40, 26, 60, 24), rect(0, 0, 0, 0))
+        cut2 = rect(-20, 50, 60, 24)
+        return dif(dif(ring, cut), cut2), W
+    if key == "B":
+        stem = cbar(0, 0, sw, 100, c, ("tl", "bl"))
+        ro1, ro2 = 26.0, 26.0
+        c1 = W - ro1
+        top = pathops.Path()
+        pen = top.getPen()
+        pen.moveTo((0, 0)); pen.lineTo((c1, 0))
+        pen.curveTo((c1 + K * ro1, 0), (c1 + ro1, 52 - K * ro1), (c1 + ro1, 52))
+        pen.lineTo((0, 52)); pen.closePath()
+        ri1 = ro1 - sw
+        hole1 = pathops.Path()
+        pen = hole1.getPen()
+        pen.moveTo((sw, sw)); pen.lineTo((c1, sw))
+        pen.curveTo((c1 + K * ri1, sw), (c1 + ri1, 52 - sw - K * ri1), (c1 + ri1, 52 - sw))
+        pen.lineTo((sw, 52 - sw)); pen.closePath()
+        c2 = W - ro2
+        bot = pathops.Path()
+        pen = bot.getPen()
+        pen.moveTo((0, 48)); pen.lineTo((c2, 48))
+        pen.curveTo((c2 + K * ro2, 48), (c2 + ro2, 100 - K * ro2), (c2 + ro2, 100))
+        pen.lineTo((0, 100)); pen.closePath()
+        ri2 = ro2 - sw
+        hole2 = pathops.Path()
+        pen = hole2.getPen()
+        pen.moveTo((sw, 48 + sw)); pen.lineTo((c2, 48 + sw))
+        pen.curveTo((c2 + K * ri2, 48 + sw), (c2 + ri2, 100 - sw - K * ri2),
+                    (c2 + ri2, 100 - sw))
+        pen.lineTo((sw, 100 - sw)); pen.closePath()
+        return uni(stem, dif(top, hole1), dif(bot, hole2)), W
     if key == "-":
         if st["penta_hyphen"]:
             return pentagon(W / 2.0, 54, 16), W
@@ -359,6 +427,9 @@ def wordmark(text, style):
     out = None
     for ch in text:
         g, adv = _glyph(GLYPH_KEYS[ch], st)
+        if g is None:
+            x += adv + st["tr"]
+            continue
         shifted = g.transform(1, 0, 0, 1, x, 0)
         out = shifted if out is None else pathops.op(out, shifted, pathops.PathOp.UNION)
         x += adv + st["tr"]
@@ -538,3 +609,185 @@ def symbol_ballbase(x0=36, cap=42, base=214, w=184, s=32, r=40, hole=19):
                 "и как мяч, и как диск штанги. Футбол и сила в одной фигуре.",
     }
 
+
+
+# ================================================================ РАУНД 3: ПЛОТНОСТЬ
+def _glyph_path(ch, style):
+    g, adv = _glyph(GLYPH_KEYS[ch], STYLES[style])
+    return g, adv
+
+
+def arc_text(text, style, cap, r_base, where, cx=128.0, cy=128.0, tracking=1.0):
+    """Леттеринг по дуге: where='top' (верха наружу) или 'bottom' (верха к центру)."""
+    st = STYLES[style]
+    sc = cap / 100.0
+    advs = []
+    for ch in text:
+        _g, adv = _glyph_path(ch, style)
+        advs.append(adv + st["tr"] * tracking)
+    total = (sum(advs) - st["tr"] * tracking) * sc
+    span = total / r_base                      # полный угол в радианах
+    out = None
+    acc = 0.0
+    for ch, adv in zip(text, advs):
+        g, _a = _glyph_path(ch, style)
+        if g is None:
+            acc += adv
+            continue
+        mid = (acc + (adv - st["tr"] * tracking) / 2.0) * sc / r_base
+        delta = mid - span / 2.0
+        if where == "top":
+            theta = -math.pi / 2 + delta
+            px, py = cx + r_base * math.cos(theta), cy + r_base * math.sin(theta)
+        else:
+            theta = math.pi / 2 + delta
+            px, py = cx + r_base * math.cos(theta), cy + r_base * math.sin(theta)
+        rot = delta
+        cosr, sinr = math.cos(rot), math.sin(rot)
+        # T(P) * R(rot) * S(sc) * T(-adv/2, -100)
+        a = cosr * sc
+        b = sinr * sc
+        c = -sinr * sc
+        d = cosr * sc
+        e = px + cosr * sc * (-(adv - st["tr"] * tracking) / 2.0) - sinr * sc * (-100)
+        f = py + sinr * sc * (-(adv - st["tr"] * tracking) / 2.0) + cosr * sc * (-100)
+        gp = g.transform(a, b, c, d, e, f)
+        out = gp if out is None else pathops.op(out, gp, pathops.PathOp.UNION)
+        acc += adv
+    return out
+
+
+def rot_about(path, deg, cx=128.0, cy=128.0):
+    r = math.radians(deg)
+    cosr, sinr = math.cos(r), math.sin(r)
+    e = cx - cosr * cx + sinr * cy
+    f = cy - sinr * cx - cosr * cy
+    return path.transform(cosr, sinr, -sinr, cosr, e, f)
+
+
+def symbol_crest(mono=False, ring_text=True):
+    """G «ГЕРБ»: круглый клубный герб — кольцо с леттерингом по дуге,
+    фактура скошенного поля, мяч-панель над штангой."""
+    cx = cy = 128.0
+    ring = dif(circle(cx, cy, 126), circle(cx, cy, 102))
+    hair = dif(circle(cx, cy, 105), circle(cx, cy, 102))
+    top = arc_text("М-ТРЕНИНГ", "pulse", 17, 114 - 8.5, "top")
+    bot = arc_text("ШКОЛА СИЛОВОГО ТРЕНИНГА", "pulse", 12, 114 + 6.0, "bottom",
+                   tracking=0.7)
+    sep_l = pentagon(cx - 114, cy, 7)
+    sep_r = pentagon(cx + 114, cy, 7)
+    field = circle(cx, cy, 102)
+    stripes = []
+    for i in range(-4, 5):
+        stripes.append(rect(cx - 160 + i * 32, cy - 160, 14, 320))
+    stripes = itr(rot_about(uni(*stripes), -18), field)
+    # штанга под наклоном (масштаб 0.88 от центра, чтобы не касаться кольца)
+    bar = rect(cx - 65, cy + 30, 130, 10)
+    plate_l = rounded_rect(cx - 81, cy + 10, 16, 50, 6)
+    plate_r = rounded_rect(cx + 65, cy + 10, 16, 50, 6)
+    col_l = rect(cx - 61, cy + 19, 6, 32)
+    col_r = rect(cx + 55, cy + 19, 6, 32)
+    bar_all = rot_about(uni(bar, plate_l, plate_r), -14)
+    collars = rot_about(uni(col_l, col_r), -14)
+    # мяч с панелью и пятью швами
+    bcx, bcy, br = cx, cy - 18, 46
+    ball = circle(bcx, bcy, br)
+    panel = pentagon(bcx, bcy, 18)
+    seams = []
+    for i in range(5):
+        a = math.radians(-90 + i * 72)
+        ux, uy = math.cos(a), math.sin(a)
+        nx, ny = -uy, ux
+        p0 = (bcx + 33 * ux, bcy + 33 * uy)
+        p1 = (bcx + (br + 2) * ux, bcy + (br + 2) * uy)
+        seams.append(poly([(p0[0] + nx * 3.2, p0[1] + ny * 3.2),
+                           (p1[0] + nx * 5.0, p1[1] + ny * 5.0),
+                           (p1[0] - nx * 5.0, p1[1] - ny * 5.0),
+                           (p0[0] - nx * 3.2, p0[1] - ny * 3.2)]))
+    seams = itr(uni(*seams), ball)
+    if mono:
+        parts = [ring, hair, bar_all, collars,
+                 dif(ball, circle(bcx, bcy, br - 9)), panel, seams]
+        if ring_text:
+            parts += [top, bot, sep_l, sep_r]
+        one = uni(*parts)
+        return {
+            "shapes": [(to_d(one), "main")],
+            "bbox": (2, 2, 254, 254),
+            "baseline": 254,
+            "name": "ГЕРБ",
+            "letter": "G",
+            "idea": "",
+        }
+    return {
+        "shapes": [
+            (to_d(ring), "ring"),
+            (to_d(uni(top, bot)), "text"),
+            (to_d(uni(sep_l, sep_r)), "accent"),
+            (to_d(field), "field"),
+            (to_d(stripes), "stripe"),
+            (to_d(hair), "accent"),
+            (to_d(bar_all), "metal"),
+            (to_d(collars), "accent"),
+            (to_d(dif(ball, panel)), "ball"),
+            (to_d(uni(panel, seams)), "accent"),
+        ],
+        "bbox": (2, 2, 254, 254),
+        "baseline": 254,
+        "name": "ГЕРБ",
+        "letter": "G",
+        "idea": "Круглый клубный герб: кольцо с леттерингом по дуге, фактура "
+                "скошенного поля, мяч-панель над штангой — клубный характер "
+                "и силовая суть в одной эмблеме.",
+    }
+
+
+def symbol_strike():
+    """H «УДАР»: мяч-М в момент удара — диагональное поле, вспышка, штрихи."""
+    cx = cy = 128.0
+    field = rot_about(rounded_rect(cx - 118, cy - 74, 236, 148, 46), -10)
+    burst = []
+    for i in range(8):
+        a = math.radians(i * 45 + 22)
+        bx, by = cx + 34, cy - 26
+        burst.append(poly([(bx + 58 * math.cos(a) - 6 * math.sin(a),
+                            by + 58 * math.sin(a) + 6 * math.cos(a)),
+                           (bx + 92 * math.cos(a), by + 92 * math.sin(a)),
+                           (bx + 58 * math.cos(a) + 6 * math.sin(a),
+                            by + 58 * math.sin(a) - 6 * math.cos(a))]))
+    burst = uni(*burst)
+    ball = circle(cx - 12, cy - 6, 72)
+    m = solid_m(cx - 12 - 41, cy - 6 - 31, cy - 6 + 31, 82, 18, apex_flat=0.09)
+    seams = []
+    for i in range(5):
+        a = math.radians(-90 + i * 72)
+        ux, uy = math.cos(a), math.sin(a)
+        nx, ny = -uy, ux
+        p0 = (cx - 12 + 54 * ux, cy - 6 + 54 * uy)
+        p1 = (cx - 12 + 74 * ux, cy - 6 + 74 * uy)
+        seams.append(poly([(p0[0] + nx * 4.5, p0[1] + ny * 4.5),
+                           (p1[0] + nx * 7.0, p1[1] + ny * 7.0),
+                           (p1[0] - nx * 7.0, p1[1] - ny * 7.0),
+                           (p0[0] - nx * 4.5, p0[1] - ny * 4.5)]))
+    seams = itr(uni(*seams), ball)
+    ballbody = dif(ball, m)
+    streaks = []
+    for i, (yy, ln) in enumerate(((cy - 44, 74), (cy - 6, 104), (cy + 32, 60))):
+        streaks.append(poly([(cx - 118, yy), (cx - 118 + ln, yy - 7),
+                             (cx - 118 + ln, yy + 1), (cx - 118, yy + 8)]))
+    streaks = rot_about(uni(*streaks), -10)
+    return {
+        "shapes": [
+            (to_d(field), "field"),
+            (to_d(burst), "burst"),
+            (to_d(streaks), "accent"),
+            (to_d(ballbody), "ball"),
+            (to_d(seams), "accent"),
+        ],
+        "bbox": (8, 26, 248, 230),
+        "baseline": 208,
+        "name": "УДАР",
+        "letter": "H",
+        "idea": "Мяч-М в момент удара: диагональное поле, вспышка за мячом и "
+                "три штриха скорости — движение и сила без единого слова.",
+    }

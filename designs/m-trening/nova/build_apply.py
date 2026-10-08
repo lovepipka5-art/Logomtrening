@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Планшет применения логотипа М-ТРЕНИНГ (концепт E «ПАНЕЛЬ»).
+"""Планшет применения логотипа М-ТРЕНИНГ (раунд 3, герб).
 
-Шесть сцен: шеврон на груди формы, крупный принт на спине, печать на мяче и
-диске штанги, аватары соцсетей, favicon и вкладка браузера, шапка сайта/документа.
+Шесть сцен: шеврон на груди формы, принт на спине, печать на мяче и диске
+штанги, аватары, favicon и вкладка браузера, шапка сайта и документов.
 """
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -16,23 +17,32 @@ KIT = os.path.join(HERE, "kit")
 MUTED = "#9FB0D8"
 PANEL = "#12214D"
 
-SYM = nl.symbol_panel()
-SMALL_SHAPES = None
 STYLE = "pulse"
+SYM = nl.symbol_crest()
+SYM_MONO = nl.symbol_crest(mono=True)
+SYM_MONO_NT = nl.symbol_crest(mono=True, ring_text=False)
+SMALL_M = nl.solid_m(69, 84, 172, 118, 25, apex_flat=0.09)
+SMALL = {"shapes": [(nl.to_d(nl.dif(nl.circle(128, 128, 104), SMALL_M)), "main")],
+         "bbox": (24, 24, 232, 232), "baseline": 232}
 
-PAL_W = {"main": nl.WHITE, "accent": nl.VOLT, "wm": nl.WHITE}
-PAL_C = {"main": nl.BLUE, "accent": nl.VOLT, "wm": nl.BLUE}
+STRIPE_D = "#16264F"
+PAL_LIGHT = {"ring": nl.BLUE, "text": nl.WHITE, "accent": nl.VOLT, "field": nl.DEEP,
+             "stripe": STRIPE_D, "metal": nl.WHITE, "ball": nl.WHITE, "wm": nl.BLUE,
+             "main": nl.BLUE}
+PAL_BLUE = {"ring": nl.WHITE, "text": nl.DEEP, "accent": nl.VOLT, "field": nl.DEEP,
+            "stripe": STRIPE_D, "metal": nl.WHITE, "ball": nl.WHITE, "wm": nl.WHITE,
+            "main": nl.WHITE}
+PAL_DEEP = {"ring": nl.BLUE, "text": nl.WHITE, "accent": nl.VOLT, "field": "#10204A",
+            "stripe": "#1A2C5C", "metal": nl.WHITE, "ball": nl.WHITE, "wm": nl.WHITE,
+            "main": nl.WHITE}
+PAL_MW = {"main": nl.WHITE, "wm": nl.WHITE}
+PAL_MB = {"main": nl.BLUE, "wm": nl.BLUE}
 
 TEE = ("M140 44 C158 26 178 20 200 20 C222 20 242 26 260 44 L356 100 L312 170 "
        "L286 152 L286 396 L114 396 L114 152 L88 170 L44 100 Z")
 
 
-def sym_svg(pal):
-    return nl.svg_symbol(SYM, pal)
-
-
 def embed(svg_str, x, y, w, h):
-    import re
     m = re.search(r"<svg\b[^>]*>", svg_str)
     tag = m.group(0)
     vb = re.search(r'viewBox="([^"]+)"', tag).group(1)
@@ -54,84 +64,73 @@ def main():
     W, H = 2400, 1560
     el = [f'<rect width="{W}" height="{H}" fill="{nl.DEEP}"/>']
     el.append('<text x="60" y="92" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «ПАНЕЛЬ» — применение</text>')
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «ГЕРБ» — применение</text>')
     el.append('<text x="60" y="138" font-family="DejaVu Sans" font-size="26" '
               f'fill="{MUTED}">Футбольная школа силового тренинга · основной цвет '
-              'Blue #1B44D8 · знак: мяч с вырубной панелью «М»</text>')
+              'Blue #1B44D8 · клубный герб: мяч-панель над штангой</text>')
 
-    TW, TH = 740, 620
-    G = 40
+    TW, TH, G = 740, 620, 40
     x0, y0 = 60, 190
 
-    # 1 — шеврон на груди формы
+    # 1 — шеврон на груди
     x, y = x0, y0
-    el += tile(x, y, TW, TH, "Форма: шеврон на груди", "65-75 мм, монохром белым по синему")
-    el.append(f'<g transform="translate({x+170} {y+70}) scale(1.0)">'
-              f'<path d="{TEE}" fill="{nl.BLUE}"/></g>')
-    el.append(embed(sym_svg(PAL_W), x + 296, y + 168, 104, 104))
-    el.append(f'<text x="{x+200}" y="{y+430}" font-family="DejaVu Sans" font-size="22" '
+    el += tile(x, y, TW, TH, "Форма: шеврон на груди", "65-75 мм, моно-герб белым")
+    el.append(f'<g transform="translate({x+170} {y+60})"><path d="{TEE}" fill="{nl.BLUE}"/></g>')
+    el.append(embed(nl.svg_symbol(SYM_MONO_NT, PAL_MW), x + 292, y + 158, 116, 116))
+    el.append(f'<text x="{x+200}" y="{y+440}" font-family="DejaVu Sans" font-size="22" '
               f'fill="{MUTED}">джерси домашняя, Blue</text>')
 
-    # 2 — крупный принт на спине
+    # 2 — принт на спине
     x = x0 + TW + G
-    el += tile(x, y, TW, TH, "Форма: принт на спине", "200-240 мм, двухцветный")
-    lay = nl.lockup_v(SYM, STYLE)
-    vb = lay["vb"]
-    el.append(embed(nl.svg_from_layout(lay, PAL_W), x + 150, y + 80, 440,
-                    440 * vb[3] / vb[2]))
+    el += tile(x, y, TW, TH, "Форма: принт на спине", "200-240 мм, полный герб")
+    el.append(embed(nl.svg_symbol(SYM, PAL_DEEP), x + 190, y + 60, 360, 360))
 
     # 3 — мяч и инвентарь
     x = x0 + 2 * (TW + G)
-    el += tile(x, y, TW, TH, "Мяч, гири, диски штанги", "1 цвет: белый или синий")
-    el.append(embed(sym_svg(PAL_C), x + 70, y + 80, 300, 300))
-    el.append(f'<circle cx="{x+540}" cy="{y+230}" r="130" fill="{nl.DEEP}" '
+    el += tile(x, y, TW, TH, "Мяч, гири, диски штанги", "монохром в 1 цвет")
+    el.append(f'<circle cx="{x+210}" cy="{y+230}" r="150" fill="#FFFFFF"/>')
+    el.append(embed(nl.svg_symbol(SYM_MONO, PAL_MB), x + 105, y + 125, 210, 210))
+    el.append(f'<circle cx="{x+530}" cy="{y+240}" r="120" fill="{nl.DEEP}" '
               f'stroke="#2A3B6E" stroke-width="12"/>')
-    el.append(embed(nl.svg_symbol(SYM, {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}),
-                    x + 455, y + 145, 170, 170))
+    el.append(embed(nl.svg_symbol(SYM_MONO, PAL_MW), x + 450, y + 160, 160, 160))
 
     y = y0 + TH + G
     # 4 — аватары
     x = x0
-    el += tile(x, y, TW, TH, "Аватары и соцсети", "квадрат и круг, Deep и Blue")
+    el += tile(x, y, TW, TH, "Аватары и соцсети", "герб на Deep и на Blue")
     el.append(f'<rect x="{x+70}" y="{y+70}" width="280" height="280" rx="64" fill="{nl.DEEP}"/>')
-    el.append(embed(sym_svg(PAL_W), x + 110, y + 110, 200, 200))
+    el.append(embed(nl.svg_symbol(SYM, PAL_DEEP), x + 100, y + 100, 220, 220))
     el.append(f'<circle cx="{x+540}" cy="{y+210}" r="140" fill="{nl.BLUE}"/>')
-    el.append(embed(sym_svg(PAL_W), x + 440, y + 110, 200, 200))
+    el.append(embed(nl.svg_symbol(SYM, PAL_BLUE), x + 430, y + 100, 220, 220))
 
     # 5 — favicon и вкладка
     x = x0 + TW + G
-    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-32 px: версия без швов")
+    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-48 px: мяч-панель «М»")
     el.append(f'<rect x="{x+60}" y="{y+90}" width="{TW-120}" height="120" rx="18" fill="#E8ECF6"/>')
-    el.append(f'<rect x="{x+80}" y="{y+110}" width="330" height="80" rx="14" fill="#FFFFFF"/>')
-    import nova_lib
-    small = nl.symbol_panel(seam_w=0.0001)
-    small_d = nl.to_d(nl.dif(nl.circle(128, 128, 104),
-                             nl.solid_m(69, 84, 172, 118, 25, apex_flat=0.09)))
+    el.append(f'<rect x="{x+80}" y="{y+110}" width="360" height="80" rx="14" fill="#FFFFFF"/>')
     el.append(f'<g transform="translate({x+96} {y+126}) scale(0.1875)">'
-              f'<path fill="{nl.BLUE}" d="{small_d}"/></g>')
+              f'<path fill="{nl.BLUE}" d="{SMALL["shapes"][0][0]}"/></g>')
     el.append(f'<text x="{x+140}" y="{y+162}" font-family="DejaVu Sans" font-size="26" '
               f'fill="#26314F">М-ТРЕНИНГ — футбольная школа</text>')
     el.append(f'<rect x="{x+60}" y="{y+230}" width="{TW-120}" height="70" rx="14" fill="#FFFFFF"/>')
     el.append(f'<text x="{x+84}" y="{y+275}" font-family="DejaVu Sans" font-size="24" '
               f'fill="#8A94B0">m-trening.ru</text>')
-    el.append(embed(nl.svg_symbol(small, {"main": nl.BLUE, "accent": nl.BLUE, "wm": nl.BLUE}),
-                    x + 90, y + 350, 64, 64))
-    el.append(embed(nl.svg_symbol(small, {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}),
-                    x + 170, y + 350, 64, 64))
+    el.append(embed(nl.svg_symbol(SMALL, PAL_MB), x + 90, y + 350, 64, 64))
+    el.append(embed(nl.svg_symbol(SMALL, PAL_MW), x + 170, y + 350, 64, 64))
     el.append(f'<text x="{x+260}" y="{y+395}" font-family="DejaVu Sans" font-size="21" '
               f'fill="{MUTED}">16, 32, 48 px — упрощённый знак</text>')
 
     # 6 — сайт и документы
     x = x0 + 2 * (TW + G)
     el += tile(x, y, TW, TH, "Сайт, презентации, документы", "горизонтальная компоновка")
-    el.append(f'<rect x="{x+50}" y="{y+80}" width="{TW-100}" height="180" rx="20" fill="#FFFFFF"/>')
+    el.append(f'<rect x="{x+50}" y="{y+70}" width="{TW-100}" height="170" rx="20" fill="#FFFFFF"/>')
     lay = nl.lockup_h(SYM, STYLE)
     vb = lay["vb"]
-    el.append(embed(nl.svg_from_layout(lay, PAL_C), x + 110, y + 115,
-                    480, 480 * vb[3] / vb[2]))
-    el.append(f'<rect x="{x+50}" y="{y+290}" width="{TW-100}" height="150" rx="20" fill="{nl.BLUE}"/>')
-    el.append(embed(nl.svg_from_layout(lay, PAL_W), x + 110, y + 315,
-                    480, 480 * vb[3] / vb[2]))
+    el.append(embed(nl.svg_from_layout(lay, PAL_LIGHT), x + 80, y + 95,
+                    520, 520 * vb[3] / vb[2]))
+    el.append(f'<rect x="{x+50}" y="{y+270}" width="{TW-100}" height="170" rx="20" fill="{nl.BLUE}"/>')
+    el.append(embed(nl.svg_from_layout(lay, PAL_BLUE), x + 80, y + 295,
+                    520, 520 * vb[3] / vb[2]))
 
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
            f'width="{W}" height="{H}">' + "".join(el) + "</svg>")

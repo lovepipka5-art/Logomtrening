@@ -1,18 +1,19 @@
-# М-ТРЕНИНГ — новый логотип 2026: «ПАНЕЛЬ»
+# М-ТРЕНИНГ — новый логотип 2026: клубный герб
 
 **Футбольная школа силового тренинга для детей и подростков.**
-Знак построен с нуля: футбольный мяч, у которого центральная панель заменена
-вырубной буквой «М», пять швов на месте. Основной цвет школы — синий `#1B44D8`,
-акцент — вольтовый `#D8F74E` (только на тёмном и на синем).
+Знак построен с нуля и не наследует прежнюю композицию «мяч + парусник +
+орбита». Основной знак — круглый клубный герб: кольцо с леттерингом по дуге,
+ночное поле со скошенным газоном, мяч с пентагоном-панелью над штангой.
+Основной цвет школы — синий `#1B44D8`, акцент — вольтовый `#D8F74E`.
 
-| Знак на синем | Знак на белом | Горизонтальная компоновка |
+| Герб на белом | Герб на синем | Горизонтальная компоновка |
 | :---: | :---: | :---: |
-| ![знак на синем](./designs/m-trening/nova/kit/exports/symbol-on-blue-1024.png) | ![знак на белом](./designs/m-trening/nova/kit/exports/symbol-on-white-1024.png) | ![горизонтальная компоновка](./designs/m-trening/nova/kit/exports/horizontal-on-blue-1600.png) |
+| ![герб на белом](./designs/m-trening/nova/kit/exports/crest-on-white-1024.png) | ![герб на синем](./designs/m-trening/nova/kit/exports/crest-on-blue-1024.png) | ![горизонтальная компоновка](./designs/m-trening/nova/kit/exports/horizontal-on-blue-1600.png) |
 
-- **Полный комплект** (мастер-SVG, PNG 1024/1600, favicon.ico, app-icon, webmanifest): [`designs/m-trening/nova/kit/`](./designs/m-trening/nova/kit)
+- **Полный комплект** (герб, моно-герб, мяч-панель «М» для 16 px, компоновки, PNG 1024/1600, favicon.ico, app-icon, webmanifest): [`designs/m-trening/nova/kit/`](./designs/m-trening/nova/kit)
 - **Планшет применения** (форма, мяч, инвентарь, аватары, вкладка браузера, сайт): [`application-board.png`](./designs/m-trening/nova/kit/application-board.png)
 - **Брендбук** (построение, палитра, охранные поля, правила и запреты): [`brand-guidelines.md`](./designs/m-trening/nova/kit/brand-guidelines.md)
-- **Концепции раунда 2** — D «ГОЛ», E «ПАНЕЛЬ», F «МЯЧ-В-БУКВЕ»: [`concepts-board.png`](./designs/m-trening/nova/concepts-board.png)
+- **Концепции раунда 2** — D «ГОЛ», E «ПАНЕЛЬ» (живёт как знак для мелких размеров), F «МЯЧ-В-БУКВЕ»: [`concepts-board.png`](./designs/m-trening/nova/concepts-board.png)
 - **Архив раунда 1** (A «ПУЛЬС», B «СРЕЗ», C «ПЕНТАГОН»): [`designs/m-trening/nova/round1/`](./designs/m-trening/nova/round1)
 
 ---
