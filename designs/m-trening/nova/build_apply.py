@@ -18,7 +18,7 @@ MUTED = "#9FB0D8"
 PANEL = "#12214D"
 
 STYLE = "penta"
-SYM = nl.symbol_regata()
+SYM = nl.symbol_orbita()
 SYM_MONO = SYM
 SYM_MONO_NT = SYM
 EMB = nl.symbol_sailpanel()
@@ -56,10 +56,10 @@ def main():
     W, H = 2400, 1560
     el = [f'<rect width="{W}" height="{H}" fill="{nl.DEEP}"/>']
     el.append('<text x="60" y="92" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «РЕГАТА» — применение</text>')
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «ОРБИТА» — применение</text>')
     el.append('<text x="60" y="138" font-family="DejaVu Sans" font-size="26" '
               f'fill="{MUTED}">Футбольная школа силового тренинга · основной цвет '
-              'Blue #1B44D8 · эволюция исходного знака: мяч, орбита-волна, парусник</text>')
+              'Blue #1B44D8 · исходный знак, пересобранный по правилам: мяч, орбита, трёхпарусник</text>')
 
     TW, TH, G = 740, 620, 40
     x0, y0 = 60, 190

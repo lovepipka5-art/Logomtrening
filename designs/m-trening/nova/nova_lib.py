@@ -911,3 +911,66 @@ def symbol_small_sail():
     return {"shapes": [(to_d(dif(dif(circle(cx, cy, 104), sail), hull)), "main")],
             "bbox": (24, 24, 232, 232), "baseline": 232, "name": "М", "letter": "M",
             "idea": ""}
+
+
+def boat3(scale=1.0):
+    """Трёхпарусный парусник исходного знака, но поставленный ровно:
+    горизонтальный корпус, две вертикальные мачты, три паруса, три флажка."""
+    hull = poly([(-42, 0), (38, 0), (27, 15), (-31, 15)])
+    mast_f = rect(-12, -64, 4, 66)
+    mast_a = rect(14, -42, 4, 44)
+    main_s = pathops.Path()
+    pen = main_s.getPen()
+    pen.moveTo((-7, -60))
+    pen.qCurveTo((18, -42), (22, -6))
+    pen.lineTo((-7, -6))
+    pen.closePath()
+    jib = pathops.Path()
+    pen = jib.getPen()
+    pen.moveTo((-10, -52))
+    pen.qCurveTo((-34, -34), (-37, -6))
+    pen.lineTo((-10, -6))
+    pen.closePath()
+    mizzen = pathops.Path()
+    pen = mizzen.getPen()
+    pen.moveTo((19, -38))
+    pen.qCurveTo((34, -24), (36, -4))
+    pen.lineTo((19, -4))
+    pen.closePath()
+    flag_f = poly([(-10, -64), (4, -59), (-10, -54)])
+    flag_a = poly([(16, -42), (28, -38), (16, -34)])
+    flag_stern = poly([(-40, 2), (-54, -6), (-40, -10)])
+    b = uni(hull, mast_f, mast_a, main_s, jib, mizzen, flag_f, flag_a, flag_stern)
+    if scale != 1.0:
+        b = b.transform(scale, 0, 0, scale, 0, 0)
+    return b
+
+
+def symbol_orbita():
+    """L «ОРБИТА»: исходный знак школы, пересобранный по правилам. Та же
+    грамматика — мяч, две дуги орбиты, парусник на орбите, леттеринг ниже —
+    но панели по правильной сетке с вертикальным пентагоном, дуги одной
+    толщины со скруглёнными концами, мачты строго вертикальны."""
+    bx, by, br = 128, 150, 86
+    panels = [rounded_pentagon(bx, by, 33, w=9, rot=0)]
+    for i in range(5):                      # средний пояс панелей
+        a = -90 + i * 72
+        panels.append(banana(bx, by, 59, a - 15, a + 15, 25))
+    for i in range(5):                      # крайний пояс, в шахматном порядке
+        a = -54 + i * 72
+        panels.append(banana(bx, by, 81, a - 20, a + 20, 9))
+    ball = itr(uni(*panels), circle(bx, by, br))
+    orbit_a = banana(bx, by, 112, 185, 285, 10)    # левое верхнее крыло орбиты
+    orbit_b = banana(bx, by, 112, -25, 45, 10)     # правое крыло
+    bt = boat3(0.88)
+    bt = bt.transform(1, 0, 0, 1, 204, 72)
+    return {
+        "shapes": [(to_d(ball), "main"), (to_d(uni(orbit_a, orbit_b)), "accent"),
+                   (to_d(bt), "main")],
+        "bbox": (11, 13, 243, 243),
+        "baseline": 243,
+        "name": "ОРБИТА",
+        "letter": "L",
+        "idea": "Исходный знак школы, пересобранный по правилам: мяч, две дуги "
+                "орбиты и трёхпарусник — мачты вертикальны, панели по сетке.",
+    }
