@@ -18,12 +18,12 @@ MUTED = "#9FB0D8"
 PANEL = "#12214D"
 
 STYLE = "varsity"
-SYM = nl.symbol_lion_mascot()
-SYM_MONO = nl.symbol_lion_mono()
+SYM = nl.symbol_fragment_m()
+SYM_MONO = nl.symbol_fragment_m()
 SYM_MONO_NT = SYM_MONO
-EMB = nl.symbol_comic_crest()
-EMB_MONO = nl.symbol_gem_shield_mono()
-SMALL = nl.symbol_gem_small()
+EMB = nl.symbol_orbita()
+EMB_MONO = nl.symbol_orbita()
+SMALL = nl.symbol_fragment_small()
 
 PAL_LIGHT = dict(nl.PAL_FULL)
 PAL_BLUE = dict(nl.PAL_FULL, wm=nl.WHITE)
@@ -57,10 +57,10 @@ def main():
     W, H = 2400, 1560
     el = [f'<rect width="{W}" height="{H}" fill="{nl.DEEP}"/>']
     el.append('<text x="60" y="92" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «ЛЕВ» — применение</text>')
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ «КОД М» — применение</text>')
     el.append('<text x="60" y="138" font-family="DejaVu Sans" font-size="26" '
               f'fill="{MUTED}">Футбольная школа силового тренинга · основной цвет '
-              'комикс-маскот: лев с гранёным мячом в зубах, контур и сел-шейдинг; эмблема — комикс-герб</text>')
+              'новая линия: сфера панелей с зазором-кодом М; эмблема — «ОРБИТА», малый знак — сфера с широким зазором</text>')
 
     TW, TH, G = 740, 620, 40
     x0, y0 = 60, 190
@@ -90,7 +90,7 @@ def main():
     y = y0 + TH + G
     # 4 — аватары
     x = x0
-    el += tile(x, y, TW, TH, "Аватары и соцсети", "эмблема «Комикс-герб» для аватаров")
+    el += tile(x, y, TW, TH, "Аватары и соцсети", "эмблема «ОРБИТА» для аватаров")
     el.append(f'<rect x="{x+70}" y="{y+70}" width="280" height="280" rx="64" fill="{nl.DEEP}"/>')
     el.append(embed(nl.svg_symbol(EMB, PAL_DEEP), x + 100, y + 100, 220, 220))
     el.append(f'<circle cx="{x+540}" cy="{y+210}" r="140" fill="{nl.BLUE}"/>')
@@ -98,7 +98,7 @@ def main():
 
     # 5 — favicon и вкладка
     x = x0 + TW + G
-    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-48 px: гранёный мяч")
+    el += tile(x, y, TW, TH, "Favicon и вкладка браузера", "16-48 px: сфера с зазором-кодом М")
     el.append(f'<rect x="{x+60}" y="{y+90}" width="{TW-120}" height="120" rx="18" fill="#E8ECF6"/>')
     el.append(f'<rect x="{x+80}" y="{y+110}" width="360" height="80" rx="14" fill="#FFFFFF"/>')
     el.append(f'<g transform="translate({x+96} {y+126}) scale(0.1875)">'
@@ -117,7 +117,7 @@ def main():
     x = x0 + 2 * (TW + G)
     el += tile(x, y, TW, TH, "Сайт, презентации, документы", "горизонтальная компоновка")
     el.append(f'<rect x="{x+50}" y="{y+70}" width="{TW-100}" height="170" rx="20" fill="#FFFFFF"/>')
-    lay = nl.lockup_h(SYM, STYLE, comic=True)
+    lay = nl.lockup_h(SYM, STYLE)
     vb = lay["vb"]
     el.append(embed(nl.svg_from_layout(lay, PAL_LIGHT), x + 80, y + 95,
                     520, 520 * vb[3] / vb[2]))

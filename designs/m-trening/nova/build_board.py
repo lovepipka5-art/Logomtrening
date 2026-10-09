@@ -30,12 +30,19 @@ def pal_light(key):
     return {"main": nl.BLUE, "accent": LIGHT_ACCENT[key], "wm": nl.BLUE}
 PAL_MONO = {"main": nl.WHITE, "accent": nl.WHITE, "wm": nl.WHITE}
 CREST = {"gemshield", "monoshield", "mane", "lion", "knight", "comiccrest"}
+NEWLINE = {"u", "v", "w"}
+FULLKEYS = CREST | NEWLINE
+PAL_DARK_FULL = dict(nl.PAL_FULL, wm=nl.WHITE)
+PAL_BLUE_FULL = dict(nl.PAL_FULL, main=nl.WHITE, lite="#B9C6FF")
 MONO_SYM = {"gemshield": nl.symbol_gem_shield_mono,
           "monoshield": nl.symbol_mono_shield_mono,
           "mane": nl.symbol_mane_roundel_mono,
           "lion": nl.symbol_lion_mono,
           "knight": nl.symbol_knight_mono,
-          "comiccrest": nl.symbol_gem_shield_mono}
+          "comiccrest": nl.symbol_gem_shield_mono,
+          "u": nl.symbol_fragment_small,
+          "v": nl.symbol_orbita,
+          "w": nl.symbol_postament}
 PAL_DARK_C = dict(nl.PAL_FULL, wm=nl.WHITE, wmo=nl.BLUE)
 
 
@@ -74,11 +81,11 @@ def board(concepts, recommend):
     H = 1500
     el = [f'<rect width="{W}" height="{H}" fill="{GRAPHITE}"/>']
     el.append('<text x="%d" y="86" font-family="DejaVu Sans" font-size="52" '
-              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 10: '
-              'комикс-маскот, серьёзный характер</text>' % GAP)
+              'font-weight="bold" fill="#FFFFFF">М-ТРЕНИНГ — раунд 11: '
+              'новая линия «КОД М»</text>' % GAP)
     el.append('<text x="%d" y="132" font-family="DejaVu Sans" font-size="26" '
-              'fill="%s">Плотный контур, сел-шейдинг и блики как в комиксах: талисман-лев '
-              'с мячом в зубах, рыцарский шлем и комикс-версия герба.</text>' % (GAP, MUTED))
+              'fill="%s">Без разлёта и кораблика: мяч старого знака стал системой — '
+              'зазоры панелей читаются как М.</text>' % (GAP, MUTED))
 
     for i, (key, sym, style) in enumerate(concepts):
         cx = GAP + i * (CW + GAP)
@@ -98,19 +105,20 @@ def board(concepts, recommend):
         tw = (CW - 24) / 2
         el.append(f'<rect x="{cx}" y="{y}" width="{tw}" height="{tw}" rx="28" '
                   f'fill="{nl.BLUE}"/>')
-        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in CREST else PAL_ONBLUE),
+        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in CREST else (PAL_BLUE_FULL if key in NEWLINE else PAL_ONBLUE)),
                         cx + 24, y + 24, tw - 48, tw - 48))
         el.append(f'<rect x="{cx+tw+24}" y="{y}" width="{tw}" height="{tw}" '
                   f'rx="28" fill="#FFFFFF"/>')
-        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in CREST else pal_light(key)),
+        el.append(embed(nl.svg_symbol(sym, nl.PAL_FULL if key in FULLKEYS else pal_light(key)),
                         cx + tw + 48, y + 24, tw - 48, tw - 48))
         y += tw + 28
         # --- горизонтальная компоновка на тёмном
-        lay = nl.lockup_h(sym, style, comic=True)
+        lay = nl.lockup_h(sym, style, comic=key in CREST)
         lh = 210
         el.append(f'<rect x="{cx}" y="{y}" width="{CW}" height="{lh}" rx="24" '
                   f'fill="{PANEL}"/>')
-        el.append(embed(nl.svg_from_layout(lay, PAL_DARK_C if key in CREST else PAL_DARK),
+        el.append(embed(nl.svg_from_layout(lay, PAL_DARK_C if key in CREST else
+                                 (PAL_DARK_FULL if key in NEWLINE else PAL_DARK)),
                         cx + 30, y + 25, CW - 60, lh - 50))
         y += lh + 24
         # --- лестница размеров (монохром на тёмном)
@@ -134,10 +142,16 @@ def board(concepts, recommend):
         wmh = 110
         el.append(f'<rect x="{cx}" y="{y}" width="{CW}" height="{wmh}" rx="24" '
                   f'fill="#FFFFFF"/>')
-        layers, w, wb = nl.wordmark_comic("М-ТРЕНИНГ", style)
-        lay = {"vb": (wb[0] - 10, wb[1] - 10, (wb[2] - wb[0]) + 26, (wb[3] - wb[1]) + 26),
+        if key in CREST:
+            layers, w, wb = nl.wordmark_comic("М-ТРЕНИНГ", style)
+            pad = 26
+        else:
+            dw, w, wb = nl.wordmark("М-ТРЕНИНГ", style)
+            layers, pad = [(dw, "wm")], 16
+        lay = {"vb": (wb[0] - 10, wb[1] - 10, (wb[2] - wb[0]) + pad + 10,
+                      (wb[3] - wb[1]) + pad + 10),
                "groups": [("translate(0 0)", layers)]}
-        el.append(embed(nl.svg_from_layout(lay, nl.PAL_FULL if key in CREST else pal_light(key)),
+        el.append(embed(nl.svg_from_layout(lay, nl.PAL_FULL if key in FULLKEYS else pal_light(key)),
                         cx + 40, y + 20, CW - 80, wmh - 40))
         y += wmh
         if key == recommend:
@@ -161,19 +175,19 @@ def board(concepts, recommend):
                   f'font-size="20" fill="{MUTED}">{name} {col}</text>')
         x += 200
     el.append(f'<text x="{x+40}" y="{y+52}" font-family="DejaVu Sans" '
-              f'font-size="22" fill="{MUTED}">Blue — основной цвет школы; Sun — '
-              f'акценты на тёмном и на синем, на белом знак монохромный.</text>')
+              f'font-size="22" fill="{MUTED}">Royal — основной цвет школы; Gold — '
+              f'акцент, Lite — блики; на белом знак монохромный.</text>')
     el.append(f'<text x="{x+40}" y="{y+86}" font-family="DejaVu Sans" '
-              f'font-size="22" fill="{MUTED}">Все контуры — вектор без растров и градиентов.</text>')
+              f'font-size="22" fill="{MUTED}">Всё — вектор без растров и градиентов.</text>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
             f'width="{W}" height="{H}">' + "".join(el) + "</svg>")
 
 
 def main():
-    concepts = [("lion", nl.symbol_lion_mascot(), "varsity"),
-                ("knight", nl.symbol_knight(), "varsity"),
-                ("comiccrest", nl.symbol_comic_crest(), "varsity")]
-    svg = board(concepts, "lion")
+    concepts = [("u", nl.symbol_fragment_m(), "varsity"),
+                ("v", nl.symbol_orbita(), "varsity"),
+                ("w", nl.symbol_postament(), "varsity")]
+    svg = board(concepts, "u")
     with open(os.path.join(OUT, "concepts-board.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     nl.render(svg, 2560, 1500, os.path.join(OUT, "concepts-board.png"))

@@ -1432,3 +1432,87 @@ def symbol_knight_mono():
     return {"shapes": [(to_d(body), "main"), (to_d(eyes), "main")],
             "bbox": (58, 12, 198, 204), "baseline": 204,
             "name": "РЫЦАРЬ", "letter": "S", "idea": ""}
+
+
+# --------------------------------------------------------------------------- раунд 11
+def _arc_pts(cx, cy, r, a0, a1, n=13):
+    pts = []
+    for i in range(n):
+        a = math.radians(a0 + (a1 - a0) * i / (n - 1))
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def _m_gap(cx, cy, g=15.0):
+    """Негативная буква М: две вертикали и центральная V."""
+    vl = stroke_polyline([(cx - 31, cy - 96), (cx - 31, cy + 96)], g, cap="butt")
+    vr = stroke_polyline([(cx + 31, cy - 96), (cx + 31, cy + 96)], g, cap="butt")
+    vv = stroke_polyline([(cx - 31, cy - 90), (cx, cy + 4), (cx + 31, cy - 90)],
+                         g, cap="butt", join="miter")
+    return uni(vl, vr, vv)
+
+
+def symbol_fragment_m(gap=15.0, arcs=True):
+    """U «КОД М»: сфера из шести панелей, зазоры между которыми читаются как М.
+    Развитие мяча-осколки старого знака: разлёт собран в ровную сферу,
+    фрагментация получила смысл (кодирует М), кораблик убран."""
+    cx, cy, r = 128.0, 124.0, 92.0
+    ball = circle(cx, cy, r)
+    panels = dif(ball, _m_gap(cx, cy, gap))
+    h = gap / 2.0
+    xl, xr = cx - 31, cx + 31
+    cres_l = itr(panels, rect(0, 0, xl - h, 256))
+    cres_r = itr(panels, rect(xr + h, 0, 256 - xr - h, 256))
+    wedge_l = itr(panels, poly([(xl + h, 0), (cx, cy), (xl + h, 256)]))
+    wedge_r = itr(panels, poly([(xr - h, 0), (cx, cy), (xr - h, 256)]))
+    tri_top = itr(panels, poly([(xl, cy - 104), (xr, cy - 104), (cx, cy - 4)]))
+    mid_bot = itr(panels, rect(xl + h, cy + 4 + h, (xr - xl) - gap, 120))
+    parts = [(to_d(cres_l), "lite"), (to_d(wedge_l), "main"), (to_d(tri_top), "gold"),
+             (to_d(wedge_r), "main"), (to_d(cres_r), "main"), (to_d(mid_bot), "main")]
+    if arcs:
+        a_tr = stroke_polyline(_arc_pts(cx, cy, 111, -72, -14), 14, cap="round")
+        a_bl = stroke_polyline(_arc_pts(cx, cy, 111, 108, 166), 14, cap="round")
+        parts = [(to_d(a_tr), "gold"), (to_d(a_bl), "lite")] + parts
+    return {"shapes": parts, "bbox": (10, 6, 246, 242), "baseline": 242,
+            "name": "КОД М", "letter": "U",
+            "idea": "Мяч старого знака собран в сферу: шесть панелей, зазоры "
+                    "между которыми читаются как буква М. Энергия мяча без "
+                    "разлёта и кораблика."}
+
+
+def symbol_fragment_small():
+    """Малый знак 16-48 px: сфера с расширенным зазором-М, без орбит."""
+    s = symbol_fragment_m(gap=26.0, arcs=False)
+    s = dict(s)
+    s["name"] = "КОД М (малый)"
+    return s
+
+
+def symbol_orbita():
+    """V «ОРБИТА»: гранёный мяч-ядро в кольце из четырёх shards-орбит —
+    траектория прогресса: подход, повтор, новый уровень."""
+    cx, cy = 128.0, 128.0
+    parts = []
+    for (a0, a1, role) in ((-78, -12, "gold"), (12, 78, "main"),
+                           (102, 168, "main"), (192, 258, "lite")):
+        sh = stroke_polyline(_arc_pts(cx, cy, 78, a0, a1), 24, cap="round")
+        parts.append((to_d(sh), role))
+    parts += gem_ball(cx, cy, 46)
+    return {"shapes": parts, "bbox": (38, 38, 218, 218), "baseline": 218,
+            "name": "ОРБИТА", "letter": "V",
+            "idea": "Гранёный мяч-ядро в кольце из четырёх shards: траектория "
+                    "прогресса — подход, повтор, новый уровень. Кругло, "
+                    "уравновешенно, масштабируемо."}
+
+
+def symbol_postament():
+    """W «ПОСТАМЕНТ»: буква-М как пьедестал, мяч в её центральном вырезе."""
+    m = stroke_polyline([(78, 214), (78, 140), (128, 184), (178, 140), (178, 214)],
+                        26, cap="square", join="round")
+    bar = _soft([(64, 226), (192, 226), (192, 240), (64, 240)], 6)
+    parts = [(to_d(m), "main"), (to_d(bar), "gold")]
+    parts += gem_ball(128, 118, 46)
+    return {"shapes": parts, "bbox": (62, 68, 194, 244), "baseline": 244,
+            "name": "ОПОРА", "letter": "W",
+            "idea": "Буква М как пьедестал: школа держит мяч на вершине. "
+                    "Монограмма и символ в одном знаке, читается с 16 px."}
